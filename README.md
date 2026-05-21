@@ -191,10 +191,52 @@ Advanced tool. Runs a simple command through `adb shell`:
 
 Use this carefully. It executes commands on the connected Android device.
 
-## Next steps
+## Real Device Validation
+
+Validation run: 2026-05-21.
+
+Device used:
+
+- Device ID: `3bf1ca15`
+- Model: `23129RA5FL`
+- Android version: `15`
+- Android SDK: `35`
+
+Tools verified:
+
+- `adb_devices`: returned the connected physical device with state `device`.
+- `android_force_stop_app`: stopped the configured `soundbend` profile package.
+- `android_launch_app`: launched `soundbend` using the package and activity from `config/apps.json`.
+- `android_screenshot`: generated `screenshots/phase2-real-device.png`; PNG signature validated successfully.
+- `android_clear_logcat`: cleared logcat without error.
+- `android_read_logcat`: profile tag filtering executed successfully, but no matching lines were emitted for the configured tags during this run.
+- `android_tap`: executed a tap at `500,1200` without error.
+- `android_swipe`: executed a visible swipe from `500,1500` to `500,500`.
+- `android_input_text`: sent `hello_android_dev_mcp`; this requires a focused editable field in the active app.
+- `android_run_shell`: returned the device model using `getprop ro.product.model`.
+
+Results:
+
+- ADB control works with a physical Android device.
+- The MCP server starts cleanly and registers all expected tools.
+- The SoundBend profile works as an example app profile without server-side SoundBend hardcoding.
+
+Problems found:
+
+- `adb` was installed locally but was not available in the default `PATH`; validation used the local Android SDK `platform-tools` directory.
+- The first screenshot validation found a PNG corruption bug caused by modifying binary output. The screenshot tool now writes the raw `adb exec-out screencap -p` buffer.
+- Profile log tags are valid, but the app did not emit matching log lines during the validation window.
+
+## Next Improvements
 
 - Project-level profile discovery.
-- Device ID selection.
+- Multi-device support.
+- Optional `deviceId`.
+- Video capture.
+- UI hierarchy dump.
+- `uiautomator` integration.
 - Debug intents per app.
+- Automation scripts.
+- Visual inspection.
 - Automatic reports.
 - App-specific helper scripts.
