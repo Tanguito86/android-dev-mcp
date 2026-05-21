@@ -3,6 +3,7 @@ import path from "node:path";
 import { z } from "zod";
 import { adb, formatError } from "../adb.js";
 import { fileSize, timestampForPath } from "../inspection.js";
+import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 const REMOTE_VIDEO_PATH = "/sdcard/android-dev-mcp-recording.mp4";
@@ -21,15 +22,17 @@ export const registerRecordVideoTool: RegisterTool = (server) => {
     },
     async ({ durationSec, outputPath, deviceId }) => {
       try {
+        const resolvedDeviceId = resolveDeviceId(deviceId);
         const duration = durationSec ?? 10;
         const videoPath = outputPath ?? path.join("recordings", `android-${timestampForPath()}.mp4`);
         const resolvedPath = path.resolve(process.cwd(), videoPath);
 
         await mkdir(path.dirname(resolvedPath), { recursive: true });
-        await adb(["shell", "rm", "-f", REMOTE_VIDEO_PATH], { deviceId });
-        await adb(["shell", "screenrecord", "--time-limit", duration, REMOTE_VIDEO_PATH], { deviceId });
-        await adb(["pull", REMOTE_VIDEO_PATH, resolvedPath], { deviceId });
+        await adb(["shell", "rm", "-f", REMOTE_VIDEO_PATH], { deviceId: resolvedDeviceId });
+        await adb(["shell", "screenrecord", "--time-limit", duration, REMOTE_VIDEO_PATH], { deviceId: resolvedDeviceId });
+        await adb(["pull", REMOTE_VIDEO_PATH, resolvedPath], { deviceId: resolvedDeviceId });
         const size = await fileSize(resolvedPath);
+        rememberSessionContext({ deviceId: resolvedDeviceId });
 
         return textResponse([`Video saved to ${videoPath}`, `size: ${size} bytes`, `duration: ${duration} seconds`].join("\n"));
       } catch (error) {

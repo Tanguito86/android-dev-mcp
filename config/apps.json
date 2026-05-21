@@ -7,7 +7,11 @@
         "SoundBend-DSP",
         "SoundBend-SRC",
         "SoundBend-AudioTrack"
-      ]
+      ],
+      "debugIntents": {
+        "openEq": "com.tanguitostudio.soundbend.DEBUG_OPEN_EQ",
+        "dumpAudio": "com.tanguitostudio.soundbend.DEBUG_DUMP_AUDIO"
+      }
     }
   }
 }

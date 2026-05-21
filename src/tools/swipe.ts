@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
+import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerSwipeTool: RegisterTool = (server) => {
@@ -19,12 +20,14 @@ export const registerSwipeTool: RegisterTool = (server) => {
     },
     async ({ x1, y1, x2, y2, durationMs, deviceId }) => {
       try {
+        const resolvedDeviceId = resolveDeviceId(deviceId);
         const args: Array<string | number> = ["shell", "input", "swipe", x1, y1, x2, y2];
         if (durationMs !== undefined) {
           args.push(durationMs);
         }
 
-        const result = await adb(args, { deviceId });
+        const result = await adb(args, { deviceId: resolvedDeviceId });
+        rememberSessionContext({ deviceId: resolvedDeviceId });
         return textResponse(formatOutput(`Swiped ${x1},${y1} to ${x2},${y2}`, result));
       } catch (error) {
         return textResponse(`Failed to swipe screen:\n${formatError(error)}`);

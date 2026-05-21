@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adb, formatError } from "../adb.js";
 import { getAppProfile } from "../appProfiles.js";
+import { rememberSessionContext, resolveApp, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 function escapeRegexTag(tag: string): string {
@@ -19,7 +20,9 @@ export const registerLogcatTools: RegisterTool = (server) => {
     },
     async ({ deviceId }) => {
       try {
-        await adb(["logcat", "-c"], { deviceId });
+        const resolvedDeviceId = resolveDeviceId(deviceId);
+        await adb(["logcat", "-c"], { deviceId: resolvedDeviceId });
+        rememberSessionContext({ deviceId: resolvedDeviceId });
         return textResponse("Logcat cleared.");
       } catch (error) {
         return textResponse(`Failed to clear logcat:\n${formatError(error)}`);
@@ -41,10 +44,13 @@ export const registerLogcatTools: RegisterTool = (server) => {
     },
     async ({ app, tags, lines, deviceId }) => {
       try {
-        const profileTags = app ? (await getAppProfile(app)).logTags ?? [] : [];
+        const resolvedDeviceId = resolveDeviceId(deviceId);
+        const resolvedApp = resolveApp(app);
+        const profileTags = resolvedApp ? (await getAppProfile(resolvedApp)).logTags ?? [] : [];
         const activeTags = tags && tags.length > 0 ? tags : profileTags;
         const lineCount = lines ?? 200;
-        const result = await adb(["logcat", "-d", "-t", lineCount], { deviceId });
+        const result = await adb(["logcat", "-d", "-t", lineCount], { deviceId: resolvedDeviceId });
+        rememberSessionContext({ app: resolvedApp, deviceId: resolvedDeviceId });
         let output = result.stdout.trim();
 
         if (activeTags.length > 0) {

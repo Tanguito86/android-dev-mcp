@@ -2,7 +2,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerCaptureStateTool } from "./tools/captureState.js";
+import { registerDebugIntentTool } from "./tools/debugIntent.js";
 import { registerDevicesTool } from "./tools/devices.js";
+import { registerFindUiTool } from "./tools/findUi.js";
 import { registerForceStopAppTool } from "./tools/forceStopApp.js";
 import { registerInputTextTool } from "./tools/inputText.js";
 import { registerInstallApkTool } from "./tools/installApk.js";
@@ -14,7 +16,9 @@ import { registerRunShellTool } from "./tools/runShell.js";
 import { registerScreenshotTool } from "./tools/screenshot.js";
 import { registerSwipeTool } from "./tools/swipe.js";
 import { registerTapTool } from "./tools/tap.js";
+import { registerTapUiTool } from "./tools/tapUi.js";
 import { registerUiDumpTool } from "./tools/uiDump.js";
+import { registerWaitForUiTool } from "./tools/waitForUi.js";
 
 const server = new McpServer({
   name: "android-dev-mcp",
@@ -35,6 +39,10 @@ registerUiDumpTool(server);
 registerCaptureStateTool(server);
 registerRecordVideoTool(server);
 registerReportTool(server);
+registerFindUiTool(server);
+registerTapUiTool(server);
+registerWaitForUiTool(server);
+registerDebugIntentTool(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

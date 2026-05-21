@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
+import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 function encodeInputText(text: string): string {
@@ -19,8 +20,10 @@ export const registerInputTextTool: RegisterTool = (server) => {
     },
     async ({ text, deviceId }) => {
       try {
+        const resolvedDeviceId = resolveDeviceId(deviceId);
         const encodedText = encodeInputText(text);
-        const result = await adb(["shell", "input", "text", encodedText], { deviceId });
+        const result = await adb(["shell", "input", "text", encodedText], { deviceId: resolvedDeviceId });
+        rememberSessionContext({ deviceId: resolvedDeviceId });
         return textResponse(formatOutput("Text input sent.", result));
       } catch (error) {
         return textResponse(`Failed to input text:\n${formatError(error)}`);

@@ -5,6 +5,7 @@ export type AppProfile = {
   package: string;
   activity: string;
   logTags?: string[];
+  debugIntents?: Record<string, string>;
 };
 
 type AppsConfig = {

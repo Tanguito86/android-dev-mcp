@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
+import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerTapTool: RegisterTool = (server) => {
@@ -16,7 +17,9 @@ export const registerTapTool: RegisterTool = (server) => {
     },
     async ({ x, y, deviceId }) => {
       try {
-        const result = await adb(["shell", "input", "tap", x, y], { deviceId });
+        const resolvedDeviceId = resolveDeviceId(deviceId);
+        const result = await adb(["shell", "input", "tap", x, y], { deviceId: resolvedDeviceId });
+        rememberSessionContext({ deviceId: resolvedDeviceId });
         return textResponse(formatOutput(`Tapped ${x},${y}`, result));
       } catch (error) {
         return textResponse(`Failed to tap screen:\n${formatError(error)}`);

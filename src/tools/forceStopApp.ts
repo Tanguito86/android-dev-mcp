@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
 import { getAppProfile } from "../appProfiles.js";
+import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerForceStopAppTool: RegisterTool = (server) => {
@@ -16,8 +17,10 @@ export const registerForceStopAppTool: RegisterTool = (server) => {
     },
     async ({ app, deviceId }) => {
       try {
+        const resolvedDeviceId = resolveDeviceId(deviceId);
         const profile = await getAppProfile(app);
-        const result = await adb(["shell", "am", "force-stop", profile.package], { deviceId });
+        const result = await adb(["shell", "am", "force-stop", profile.package], { deviceId: resolvedDeviceId });
+        rememberSessionContext({ app, deviceId: resolvedDeviceId });
         return textResponse(formatOutput(`Force-stopped ${app} (${profile.package})`, result));
       } catch (error) {
         return textResponse(`Failed to force stop app:\n${formatError(error)}`);

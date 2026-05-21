@@ -85,13 +85,17 @@ Profiles live in `config/apps.json`. Add one profile per Android app:
     "myapp": {
       "package": "com.example.myapp",
       "activity": ".MainActivity",
-      "logTags": ["MyApp", "MyApp-Network"]
+      "logTags": ["MyApp", "MyApp-Network"],
+      "debugIntents": {
+        "openDebug": "com.example.myapp.DEBUG_OPEN"
+      }
     }
   }
 }
 ```
 
 The profile key, such as `myapp`, is the value passed to tools that accept `app`.
+`debugIntents` is optional and maps a short agent-friendly name to an Android broadcast action.
 
 ## Example profile
 
@@ -237,6 +241,80 @@ Generated files:
 { "app": "myapp", "lines": 500, "deviceId": "3bf1ca15" }
 ```
 
+### `android_find_ui`
+
+Dumps the current UI hierarchy, parses Android `node` elements, and searches by visible text or `resource-id`.
+
+Find a Play button:
+
+```json
+{ "text": "Play", "deviceId": "3bf1ca15" }
+```
+
+Find by resource id:
+
+```json
+{ "resourceId": "com.example.myapp:id/play_button" }
+```
+
+Results include text, resource id, clickability, bounds, and center coordinates.
+
+### `android_tap_ui`
+
+Finds a UI node and taps the center of its bounds. If multiple nodes match, the tool returns the matches and asks for an `index`.
+
+Tap on a DSP control:
+
+```json
+{ "text": "DSP", "index": 0, "deviceId": "3bf1ca15" }
+```
+
+Tap by resource id:
+
+```json
+{ "resourceId": "com.example.myapp:id/dsp_toggle" }
+```
+
+### `android_wait_for_ui`
+
+Polls the UI hierarchy until text or a resource id appears. Defaults: 10 seconds timeout, 1000 ms interval.
+
+Wait for text:
+
+```json
+{ "text": "Ready", "timeoutSec": 10, "intervalMs": 1000 }
+```
+
+Wait for a button by id:
+
+```json
+{ "resourceId": "com.example.myapp:id/continue_button", "timeoutSec": 20 }
+```
+
+### `android_send_debug_intent`
+
+Sends a configured app debug broadcast intent from `config/apps.json`.
+
+```json
+{ "app": "myapp", "intent": "openDebug" }
+```
+
+With extras:
+
+```json
+{
+  "app": "myapp",
+  "intent": "openDebug",
+  "extras": {
+    "enabled": true,
+    "level": 3,
+    "label": "agent-check"
+  }
+}
+```
+
+Extras support simple string, number, and boolean values.
+
 ### `android_tap`
 
 Taps screen coordinates:
@@ -318,13 +396,10 @@ Problems found:
 ## Next Improvements
 
 - Project-level profile discovery.
-- Multi-device support.
-- Optional `deviceId`.
-- Video capture.
-- UI hierarchy dump.
-- `uiautomator` integration.
-- Debug intents per app.
 - Automation scripts.
 - Visual inspection.
-- Automatic reports.
 - App-specific helper scripts.
+- UI search filters by class/package/clickable state.
+- Minimal XML result summaries for agent planning.
+- Better current-activity detection from `dumpsys`.
+- Optional cleanup for temporary files on the device.

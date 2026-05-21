@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { adb, formatError, listDevices, validateDeviceId } from "../adb.js";
+import { rememberSessionContext } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerDevicesTool: RegisterTool = (server) => {
@@ -18,6 +19,7 @@ export const registerDevicesTool: RegisterTool = (server) => {
           await validateDeviceId(deviceId);
           const devices = await listDevices();
           const device = devices.find((candidate) => candidate.id === deviceId);
+          rememberSessionContext({ deviceId });
           return textResponse(`Device ${deviceId} is connected with state ${device?.state ?? "unknown"}.`);
         }
 
