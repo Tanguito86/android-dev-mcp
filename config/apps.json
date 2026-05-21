@@ -1,0 +1,13 @@
+{
+  "apps": {
+    "soundbend": {
+      "package": "com.tanguitostudio.soundbend",
+      "activity": ".MainActivity",
+      "logTags": [
+        "SoundBend-DSP",
+        "SoundBend-SRC",
+        "SoundBend-AudioTrack"
+      ]
+    }
+  }
+}

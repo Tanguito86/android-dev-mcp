@@ -1,0 +1,26 @@
+{
+  "name": "android-dev-mcp",
+  "version": "0.1.0",
+  "description": "Generic MCP server for controlling Android development apps through ADB.",
+  "type": "module",
+  "bin": {
+    "android-dev-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
