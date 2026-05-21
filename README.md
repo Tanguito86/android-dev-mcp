@@ -394,6 +394,104 @@ Extras support simple string, number, and boolean values.
 
 The intended agent loop is: launch app, wait for UI, tap a node, capture state, generate a report when something looks wrong.
 
+## Workflow Examples
+
+Workflows are simple linear JSON sequences stored inside each app profile in `config/apps.json`. They do not support loops, conditions, scripts, or dynamic code.
+
+Example:
+
+```json
+{
+  "workflows": {
+    "smoke": [
+      {
+        "tool": "android_launch_app",
+        "args": {}
+      },
+      {
+        "tool": "android_wait_for_ui",
+        "args": {
+          "text": "DSP"
+        }
+      },
+      {
+        "tool": "android_capture_state",
+        "args": {}
+      }
+    ]
+  }
+}
+```
+
+Run a workflow:
+
+```json
+{ "app": "soundbend", "workflow": "smoke", "deviceId": "3bf1ca15" }
+```
+
+Workflow context is propagated automatically:
+
+- The `app` passed to `android_run_workflow` is inherited by every step.
+- The optional `deviceId` is inherited by every step.
+- A step can override inherited values by setting them explicitly in `args`.
+
+Each workflow run creates a folder under `workflow-reports/` with:
+
+- `workflow.json`
+- `execution-log.json`
+- `metadata.json`
+- generated screenshots, UI dumps, captures, and reports from workflow steps
+
+### SoundBend smoke
+
+```json
+{ "app": "soundbend", "workflow": "smoke", "deviceId": "3bf1ca15" }
+```
+
+Sequence:
+
+1. Launch app.
+2. Wait for `DSP`.
+3. Capture state.
+4. Generate report.
+
+### SoundBend open EQ
+
+```json
+{ "app": "soundbend", "workflow": "openEq", "deviceId": "3bf1ca15" }
+```
+
+Sequence:
+
+1. Launch app.
+2. Send configured `openEq` debug intent.
+3. Capture state.
+
+### SoundBend audio state report
+
+```json
+{ "app": "soundbend", "workflow": "captureAudioState", "deviceId": "3bf1ca15" }
+```
+
+Sequence:
+
+1. Launch app.
+2. Send configured `dumpAudio` debug intent.
+3. Capture state.
+4. Generate report.
+
+### Settings smoke
+
+```json
+{ "app": "system", "workflow": "systemUiSmoke", "deviceId": "3bf1ca15" }
+```
+
+Sequence:
+
+1. Launch Android Settings.
+2. Capture screenshot.
+3. Generate report.
+
 ### `android_tap`
 
 Taps screen coordinates:

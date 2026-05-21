@@ -11,6 +11,94 @@
       "debugIntents": {
         "openEq": "com.tanguitostudio.soundbend.DEBUG_OPEN_EQ",
         "dumpAudio": "com.tanguitostudio.soundbend.DEBUG_DUMP_AUDIO"
+      },
+      "workflows": {
+        "smoke": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_wait_for_ui",
+            "args": {
+              "text": "DSP",
+              "timeoutSec": 10
+            }
+          },
+          {
+            "tool": "android_capture_state",
+            "args": {}
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 500
+            }
+          }
+        ],
+        "openEq": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_send_debug_intent",
+            "args": {
+              "intent": "openEq"
+            }
+          },
+          {
+            "tool": "android_capture_state",
+            "args": {}
+          }
+        ],
+        "captureAudioState": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_send_debug_intent",
+            "args": {
+              "intent": "dumpAudio"
+            }
+          },
+          {
+            "tool": "android_capture_state",
+            "args": {}
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 500
+            }
+          }
+        ]
+      }
+    },
+    "system": {
+      "package": "com.android.settings",
+      "activity": ".Settings",
+      "logTags": [
+        "Settings"
+      ],
+      "workflows": {
+        "systemUiSmoke": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_screenshot",
+            "args": {}
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 200
+            }
+          }
+        ]
       }
     }
   }

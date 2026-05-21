@@ -1,11 +1,17 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+export type WorkflowStep = {
+  tool: string;
+  args?: Record<string, unknown>;
+};
+
 export type AppProfile = {
   package: string;
   activity: string;
   logTags?: string[];
   debugIntents?: Record<string, string>;
+  workflows?: Record<string, WorkflowStep[]>;
 };
 
 type AppsConfig = {
@@ -46,4 +52,20 @@ export async function getAppProfile(app: string): Promise<AppProfile> {
   }
 
   return profile;
+}
+
+export async function getAppWorkflow(app: string, workflow: string): Promise<WorkflowStep[]> {
+  const profile = await getAppProfile(app);
+  const steps = profile.workflows?.[workflow];
+
+  if (!steps) {
+    const available = Object.keys(profile.workflows ?? {}).sort().join(", ") || "none";
+    throw new Error(`Unknown workflow "${workflow}" for app "${app}". Available workflows: ${available}.`);
+  }
+
+  if (!Array.isArray(steps)) {
+    throw new Error(`Workflow "${workflow}" for app "${app}" must be an array.`);
+  }
+
+  return steps;
 }

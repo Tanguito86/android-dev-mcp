@@ -13,6 +13,7 @@ import { registerLogcatTools } from "./tools/logcat.js";
 import { registerRecordVideoTool } from "./tools/recordVideo.js";
 import { registerReportTool } from "./tools/report.js";
 import { registerRunShellTool } from "./tools/runShell.js";
+import { registerRunWorkflowTool } from "./tools/runWorkflow.js";
 import { registerScreenshotTool } from "./tools/screenshot.js";
 import { registerSwipeTool } from "./tools/swipe.js";
 import { registerTapResourceTool } from "./tools/tapResource.js";
@@ -47,6 +48,7 @@ registerWaitForUiTool(server);
 registerDebugIntentTool(server);
 registerTapTextTool(server);
 registerTapResourceTool(server);
+registerRunWorkflowTool(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
