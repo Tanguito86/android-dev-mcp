@@ -1,4 +1,8 @@
 node_modules/
 dist/
 screenshots/
+ui-dumps/
+captures/
+recordings/
+reports/
 npm-debug.log*

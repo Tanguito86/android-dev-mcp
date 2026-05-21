@@ -10,12 +10,13 @@ export const registerTapTool: RegisterTool = (server) => {
       description: "Run adb shell input tap with x/y coordinates.",
       inputSchema: {
         x: z.number().int(),
-        y: z.number().int()
+        y: z.number().int(),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ x, y }) => {
+    async ({ x, y, deviceId }) => {
       try {
-        const result = await adb(["shell", "input", "tap", x, y]);
+        const result = await adb(["shell", "input", "tap", x, y], { deviceId });
         return textResponse(formatOutput(`Tapped ${x},${y}`, result));
       } catch (error) {
         return textResponse(`Failed to tap screen:\n${formatError(error)}`);

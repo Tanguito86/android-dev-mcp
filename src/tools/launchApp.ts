@@ -10,14 +10,15 @@ export const registerLaunchAppTool: RegisterTool = (server) => {
       title: "Launch Android app",
       description: "Launch an Android app using a profile from config/apps.json.",
       inputSchema: {
-        app: z.string().min(1)
+        app: z.string().min(1),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ app }) => {
+    async ({ app, deviceId }) => {
       try {
         const profile = await getAppProfile(app);
         const component = `${profile.package}/${profile.activity}`;
-        const result = await adb(["shell", "am", "start", "-n", component]);
+        const result = await adb(["shell", "am", "start", "-n", component], { deviceId });
         return textResponse(formatOutput(`Launched ${app} (${component})`, result));
       } catch (error) {
         return textResponse(`Failed to launch app:\n${formatError(error)}`);

@@ -13,17 +13,18 @@ export const registerSwipeTool: RegisterTool = (server) => {
         y1: z.number().int(),
         x2: z.number().int(),
         y2: z.number().int(),
-        durationMs: z.number().int().positive().optional()
+        durationMs: z.number().int().positive().optional(),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ x1, y1, x2, y2, durationMs }) => {
+    async ({ x1, y1, x2, y2, durationMs, deviceId }) => {
       try {
         const args: Array<string | number> = ["shell", "input", "swipe", x1, y1, x2, y2];
         if (durationMs !== undefined) {
           args.push(durationMs);
         }
 
-        const result = await adb(args);
+        const result = await adb(args, { deviceId });
         return textResponse(formatOutput(`Swiped ${x1},${y1} to ${x2},${y2}`, result));
       } catch (error) {
         return textResponse(`Failed to swipe screen:\n${formatError(error)}`);

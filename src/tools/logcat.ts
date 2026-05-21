@@ -13,11 +13,13 @@ export const registerLogcatTools: RegisterTool = (server) => {
     {
       title: "Clear Android logcat",
       description: "Clear the Android logcat buffer.",
-      inputSchema: {}
+      inputSchema: {
+        deviceId: z.string().min(1).optional()
+      }
     },
-    async () => {
+    async ({ deviceId }) => {
       try {
-        await adb(["logcat", "-c"]);
+        await adb(["logcat", "-c"], { deviceId });
         return textResponse("Logcat cleared.");
       } catch (error) {
         return textResponse(`Failed to clear logcat:\n${formatError(error)}`);
@@ -33,15 +35,16 @@ export const registerLogcatTools: RegisterTool = (server) => {
       inputSchema: {
         app: z.string().min(1).optional(),
         tags: z.array(z.string().min(1)).optional(),
-        lines: z.number().int().positive().max(5000).optional()
+        lines: z.number().int().positive().max(5000).optional(),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ app, tags, lines }) => {
+    async ({ app, tags, lines, deviceId }) => {
       try {
         const profileTags = app ? (await getAppProfile(app)).logTags ?? [] : [];
         const activeTags = tags && tags.length > 0 ? tags : profileTags;
         const lineCount = lines ?? 200;
-        const result = await adb(["logcat", "-d", "-t", lineCount]);
+        const result = await adb(["logcat", "-d", "-t", lineCount], { deviceId });
         let output = result.stdout.trim();
 
         if (activeTags.length > 0) {

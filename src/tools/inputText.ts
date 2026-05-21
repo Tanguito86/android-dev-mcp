@@ -13,13 +13,14 @@ export const registerInputTextTool: RegisterTool = (server) => {
       title: "Input Android text",
       description: "Type text with adb shell input text.",
       inputSchema: {
-        text: z.string()
+        text: z.string(),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ text }) => {
+    async ({ text, deviceId }) => {
       try {
         const encodedText = encodeInputText(text);
-        const result = await adb(["shell", "input", "text", encodedText]);
+        const result = await adb(["shell", "input", "text", encodedText], { deviceId });
         return textResponse(formatOutput("Text input sent.", result));
       } catch (error) {
         return textResponse(`Failed to input text:\n${formatError(error)}`);

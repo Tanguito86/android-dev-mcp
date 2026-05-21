@@ -10,13 +10,14 @@ export const registerInstallApkTool: RegisterTool = (server) => {
       title: "Install Android APK",
       description: "Install a debug APK using adb install -r.",
       inputSchema: {
-        apkPath: z.string().min(1)
+        apkPath: z.string().min(1),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ apkPath }) => {
+    async ({ apkPath, deviceId }) => {
       try {
         await access(apkPath);
-        const result = await adb(["install", "-r", apkPath]);
+        const result = await adb(["install", "-r", apkPath], { deviceId });
         return textResponse(formatOutput(`Installed APK: ${apkPath}`, result));
       } catch (error) {
         return textResponse(`Failed to install APK:\n${formatError(error)}`);

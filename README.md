@@ -48,6 +48,24 @@ adb devices
 
 If no device appears, confirm that USB debugging is enabled and that the device authorization prompt was accepted.
 
+## Multi-device usage
+
+Most tools accept an optional `deviceId`. When omitted, ADB uses its default behavior. When provided, commands are run as `adb -s SERIAL ...`.
+
+Find serials:
+
+```powershell
+adb devices
+```
+
+Example:
+
+```json
+{ "deviceId": "3bf1ca15" }
+```
+
+If a `deviceId` is not connected or is not in state `device`, the server returns a clear error with the currently available devices.
+
 ## Enable USB debugging
 
 1. Open Android Settings.
@@ -111,6 +129,12 @@ Launches an app from `config/apps.json`:
 { "app": "myapp" }
 ```
 
+With a specific device:
+
+```json
+{ "app": "myapp", "deviceId": "3bf1ca15" }
+```
+
 ### `android_force_stop_app`
 
 Stops an app by package using its profile:
@@ -147,6 +171,70 @@ Captures a screenshot. If `outputPath` is omitted, a file is written under `scre
 
 ```json
 { "outputPath": "screenshots/home.png" }
+```
+
+With a specific device:
+
+```json
+{ "outputPath": "screenshots/home.png", "deviceId": "3bf1ca15" }
+```
+
+### `android_ui_dump`
+
+Captures the current Android UI hierarchy using `uiautomator dump` and saves the XML under `ui-dumps/` by default.
+
+```json
+{ "deviceId": "3bf1ca15" }
+```
+
+Custom path:
+
+```json
+{ "outputPath": "ui-dumps/current.xml" }
+```
+
+### `android_capture_state`
+
+Captures a screenshot, UI dump, and metadata together under `captures/YYYY-MM-DD_HH-mm-ss/`.
+
+Generated files:
+
+- `screenshot.png`
+- `window_dump.xml`
+- `metadata.json`
+
+```json
+{ "app": "myapp", "deviceId": "3bf1ca15" }
+```
+
+### `android_record_video`
+
+Records a short screen video using `adb shell screenrecord`. The default duration is 10 seconds and the maximum is 180 seconds. Files are saved under `recordings/` by default.
+
+```json
+{ "durationSec": 10, "deviceId": "3bf1ca15" }
+```
+
+Custom path:
+
+```json
+{ "durationSec": 5, "outputPath": "recordings/quick-check.mp4" }
+```
+
+### `android_generate_report`
+
+Creates a basic debugging bundle under `reports/report_TIMESTAMP/`.
+
+Generated files:
+
+- `screenshot.png`
+- `window_dump.xml`
+- `logcat.txt`
+- `metadata.json`
+- `device-info.txt`
+
+```json
+{ "app": "myapp", "lines": 500, "deviceId": "3bf1ca15" }
 ```
 
 ### `android_tap`

@@ -11,14 +11,15 @@ export const registerScreenshotTool: RegisterTool = (server) => {
       title: "Capture Android screenshot",
       description: "Capture a PNG screenshot using adb exec-out screencap -p.",
       inputSchema: {
-        outputPath: z.string().min(1).optional()
+        outputPath: z.string().min(1).optional(),
+        deviceId: z.string().min(1).optional()
       }
     },
-    async ({ outputPath }) => {
+    async ({ outputPath, deviceId }) => {
       try {
         const screenshotPath = outputPath ?? path.join("screenshots", `android-${Date.now()}.png`);
         const resolvedPath = path.resolve(process.cwd(), screenshotPath);
-        const png = await adbBinary(["exec-out", "screencap", "-p"]);
+        const png = await adbBinary(["exec-out", "screencap", "-p"], { deviceId });
 
         await mkdir(path.dirname(resolvedPath), { recursive: true });
         await writeFile(resolvedPath, png);
