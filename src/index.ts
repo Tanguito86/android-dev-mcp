@@ -15,7 +15,9 @@ import { registerReportTool } from "./tools/report.js";
 import { registerRunShellTool } from "./tools/runShell.js";
 import { registerScreenshotTool } from "./tools/screenshot.js";
 import { registerSwipeTool } from "./tools/swipe.js";
+import { registerTapResourceTool } from "./tools/tapResource.js";
 import { registerTapTool } from "./tools/tap.js";
+import { registerTapTextTool } from "./tools/tapText.js";
 import { registerTapUiTool } from "./tools/tapUi.js";
 import { registerUiDumpTool } from "./tools/uiDump.js";
 import { registerWaitForUiTool } from "./tools/waitForUi.js";
@@ -43,6 +45,8 @@ registerFindUiTool(server);
 registerTapUiTool(server);
 registerWaitForUiTool(server);
 registerDebugIntentTool(server);
+registerTapTextTool(server);
+registerTapResourceTool(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);

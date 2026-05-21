@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { adb, formatError } from "../adb.js";
+import { createFailureReport } from "../failureDiagnostics.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
+import { formatUiFilters, hasAnyUiFilter } from "../uiFilters.js";
 import { formatUiMatch } from "../uiParser.js";
 import { dumpAndFindUiNodes } from "./findUi.js";
 import { textResponse, type RegisterTool } from "./types.js";
@@ -14,26 +16,32 @@ export const registerTapUiTool: RegisterTool = (server) => {
       inputSchema: {
         text: z.string().min(1).optional(),
         resourceId: z.string().min(1).optional(),
+        className: z.string().min(1).optional(),
+        packageName: z.string().min(1).optional(),
+        clickable: z.boolean().optional(),
+        enabled: z.boolean().optional(),
         index: z.number().int().nonnegative().optional(),
         deviceId: z.string().min(1).optional()
       }
     },
-    async ({ text, resourceId, index, deviceId }) => {
+    async ({ text, resourceId, className, packageName, clickable, enabled, index, deviceId }) => {
       try {
-        if (!text && !resourceId) {
-          return textResponse("Provide text, resourceId, or both.");
+        const filters = { text, resourceId, className, packageName, clickable, enabled };
+        if (!hasAnyUiFilter(filters)) {
+          return textResponse("Provide at least one UI filter.");
         }
 
         const resolvedDeviceId = resolveDeviceId(deviceId);
-        const result = await dumpAndFindUiNodes({ text, resourceId, deviceId: resolvedDeviceId });
+        const result = await dumpAndFindUiNodes({ ...filters, deviceId: resolvedDeviceId });
 
         if (result.matches.length === 0) {
-          return textResponse(`No UI matches found.\ndump: ${result.dumpPath}`);
+          const reportPath = await createFailureReport("tap-ui-no-match", { deviceId: resolvedDeviceId }, { filters });
+          return textResponse(`No UI matches found.\nfilters: ${formatUiFilters(filters)}\ndump: ${result.dumpPath}\nfailure report: ${reportPath}`);
         }
 
         if (index === undefined && result.matches.length > 1) {
           return textResponse(
-            [`Multiple UI matches found. Pass index to choose one.`, `dump: ${result.dumpPath}`]
+            [`Multiple UI matches found (${result.matches.length}). Pass index to choose one.`, `filters: ${formatUiFilters(filters)}`, `dump: ${result.dumpPath}`]
               .concat(result.matches.map((match, matchIndex) => formatUiMatch(match, matchIndex)))
               .join("\n\n")
           );
@@ -42,11 +50,13 @@ export const registerTapUiTool: RegisterTool = (server) => {
         const selectedIndex = index ?? 0;
         const selected = result.matches[selectedIndex];
         if (!selected) {
-          return textResponse(`No UI match at index ${selectedIndex}. Found ${result.matches.length} match(es).`);
+          const reportPath = await createFailureReport("tap-ui-bad-index", { deviceId: resolvedDeviceId }, { filters, index: selectedIndex });
+          return textResponse(`No UI match at index ${selectedIndex}. Found ${result.matches.length} match(es).\nfailure report: ${reportPath}`);
         }
 
         if (selected.centerX === undefined || selected.centerY === undefined) {
-          return textResponse(`Selected UI match has no usable bounds.\n\n${formatUiMatch(selected, selectedIndex)}`);
+          const reportPath = await createFailureReport("tap-ui-no-bounds", { deviceId: resolvedDeviceId }, { filters, index: selectedIndex });
+          return textResponse(`Selected UI match has no usable bounds.\nfailure report: ${reportPath}\n\n${formatUiMatch(selected, selectedIndex)}`);
         }
 
         await adb(["shell", "input", "tap", selected.centerX, selected.centerY], { deviceId: resolvedDeviceId });
@@ -57,7 +67,9 @@ export const registerTapUiTool: RegisterTool = (server) => {
         return textResponse(
           [
             `Tapped UI match #${selectedIndex}`,
+            `total matches: ${result.matches.length}`,
             `coordinates: ${selected.centerX},${selected.centerY}`,
+            `filters: ${formatUiFilters(filters)}`,
             `dump: ${result.dumpPath}`,
             formatUiMatch(selected, selectedIndex)
           ].join("\n\n")
@@ -68,4 +80,3 @@ export const registerTapUiTool: RegisterTool = (server) => {
     }
   );
 };
-

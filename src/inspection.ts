@@ -1,5 +1,6 @@
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { getCurrentActivity } from "./activity.js";
 import { adb, adbBinary, type AdbOptions } from "./adb.js";
 
 const REMOTE_UI_DUMP_PATH = "/sdcard/window_dump.xml";
@@ -12,6 +13,12 @@ export type DeviceMetadata = {
   androidVersion: string;
   currentFocus?: string;
   app?: string;
+  currentActivity?: {
+    packageName?: string;
+    activityName?: string;
+    rawSource: string;
+  };
+  details?: Record<string, unknown>;
 };
 
 export function timestampForPath(date = new Date()): string {
@@ -64,11 +71,12 @@ function parseFocus(dumpsysWindow: string): string | undefined {
 }
 
 export async function getDeviceMetadata(options: AdbOptions = {}, app?: string): Promise<DeviceMetadata> {
-  const [model, sdk, androidVersion, windowDump] = await Promise.all([
+  const [model, sdk, androidVersion, windowDump, currentActivity] = await Promise.all([
     adb(["shell", "getprop", "ro.product.model"], options),
     adb(["shell", "getprop", "ro.build.version.sdk"], options),
     adb(["shell", "getprop", "ro.build.version.release"], options),
-    adb(["shell", "dumpsys", "window"], options)
+    adb(["shell", "dumpsys", "window"], options),
+    getCurrentActivity(options)
   ]);
 
   return {
@@ -78,6 +86,7 @@ export async function getDeviceMetadata(options: AdbOptions = {}, app?: string):
     sdk: sdk.stdout.trim(),
     androidVersion: androidVersion.stdout.trim(),
     currentFocus: parseFocus(windowDump.stdout),
+    currentActivity,
     app
   };
 }

@@ -1,7 +1,9 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import { z } from "zod";
 import { formatError } from "../adb.js";
+import { createFailureReport } from "../failureDiagnostics.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
+import { formatUiFilters, hasAnyUiFilter } from "../uiFilters.js";
 import { formatUiMatch } from "../uiParser.js";
 import { dumpAndFindUiNodes } from "./findUi.js";
 import { textResponse, type RegisterTool } from "./types.js";
@@ -15,15 +17,20 @@ export const registerWaitForUiTool: RegisterTool = (server) => {
       inputSchema: {
         text: z.string().min(1).optional(),
         resourceId: z.string().min(1).optional(),
+        className: z.string().min(1).optional(),
+        packageName: z.string().min(1).optional(),
+        clickable: z.boolean().optional(),
+        enabled: z.boolean().optional(),
         timeoutSec: z.number().int().positive().max(300).optional(),
         intervalMs: z.number().int().positive().max(10000).optional(),
         deviceId: z.string().min(1).optional()
       }
     },
-    async ({ text, resourceId, timeoutSec, intervalMs, deviceId }) => {
+    async ({ text, resourceId, className, packageName, clickable, enabled, timeoutSec, intervalMs, deviceId }) => {
       try {
-        if (!text && !resourceId) {
-          return textResponse("Provide text, resourceId, or both.");
+        const filters = { text, resourceId, className, packageName, clickable, enabled };
+        if (!hasAnyUiFilter(filters)) {
+          return textResponse("Provide at least one UI filter.");
         }
 
         const resolvedDeviceId = resolveDeviceId(deviceId);
@@ -33,7 +40,7 @@ export const registerWaitForUiTool: RegisterTool = (server) => {
         let lastDumpPath = "";
 
         while (Date.now() <= deadline) {
-          const result = await dumpAndFindUiNodes({ text, resourceId, deviceId: resolvedDeviceId });
+          const result = await dumpAndFindUiNodes({ ...filters, deviceId: resolvedDeviceId });
           lastDumpPath = result.dumpPath;
 
           if (result.matches.length > 0) {
@@ -44,6 +51,7 @@ export const registerWaitForUiTool: RegisterTool = (server) => {
             return textResponse(
               [
                 `UI node appeared after ${timeout * 1000 - Math.max(0, deadline - Date.now())} ms.`,
+                `filters: ${formatUiFilters(filters)}`,
                 `dump: ${result.dumpPath}`,
                 formatUiMatch(result.matches[0], 0)
               ].join("\n\n")
@@ -57,11 +65,11 @@ export const registerWaitForUiTool: RegisterTool = (server) => {
           await sleep(interval);
         }
 
-        return textResponse(`Timed out after ${timeout} seconds waiting for UI node.\nlast dump: ${lastDumpPath}`);
+        const reportPath = await createFailureReport("wait-ui-timeout", { deviceId: resolvedDeviceId }, { filters, timeoutSec: timeout });
+        return textResponse(`Timed out after ${timeout} seconds waiting for UI node.\nfilters: ${formatUiFilters(filters)}\nlast dump: ${lastDumpPath}\nfailure report: ${reportPath}`);
       } catch (error) {
         return textResponse(`Failed while waiting for UI node:\n${formatError(error)}`);
       }
     }
   );
 };
-

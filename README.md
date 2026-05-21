@@ -258,6 +258,17 @@ Find by resource id:
 ```
 
 Results include text, resource id, clickability, bounds, and center coordinates.
+Additional filters can be combined:
+
+```json
+{
+  "text": "Play",
+  "className": "TextView",
+  "packageName": "com.example.myapp",
+  "clickable": true,
+  "enabled": true
+}
+```
 
 ### `android_tap_ui`
 
@@ -275,6 +286,24 @@ Tap by resource id:
 { "resourceId": "com.example.myapp:id/dsp_toggle" }
 ```
 
+You can also filter by `className`, `packageName`, `clickable`, and `enabled`. If a tap fails because there are no matches, a node has no bounds, or an invalid index is requested, the tool creates a bundle under `failure-reports/`.
+
+### `android_tap_text`
+
+Shortcut for tapping visible text.
+
+```json
+{ "text": "Play", "index": 0, "deviceId": "3bf1ca15" }
+```
+
+### `android_tap_resource`
+
+Shortcut for tapping a node by resource id.
+
+```json
+{ "resourceId": "com.example.myapp:id/play_button", "index": 0 }
+```
+
 ### `android_wait_for_ui`
 
 Polls the UI hierarchy until text or a resource id appears. Defaults: 10 seconds timeout, 1000 ms interval.
@@ -290,6 +319,8 @@ Wait for a button by id:
 ```json
 { "resourceId": "com.example.myapp:id/continue_button", "timeoutSec": 20 }
 ```
+
+Wait also supports `className`, `packageName`, `clickable`, and `enabled`. On timeout, it writes screenshot, UI dump, and activity metadata under `failure-reports/`.
 
 ### `android_send_debug_intent`
 
@@ -314,6 +345,54 @@ With extras:
 ```
 
 Extras support simple string, number, and boolean values.
+
+## Example Agent Workflows
+
+### SoundBend inspection
+
+1. Launch SoundBend:
+
+```json
+{ "app": "soundbend", "deviceId": "3bf1ca15" }
+```
+
+2. Wait for a DSP-related UI element:
+
+```json
+{ "text": "DSP", "timeoutSec": 10, "deviceId": "3bf1ca15" }
+```
+
+3. Tap an EQ control by visible text:
+
+```json
+{ "text": "EQ", "index": 0, "deviceId": "3bf1ca15" }
+```
+
+4. Send a configured debug intent:
+
+```json
+{ "app": "soundbend", "intent": "openEq", "deviceId": "3bf1ca15" }
+```
+
+5. Capture app state:
+
+```json
+{ "app": "soundbend", "deviceId": "3bf1ca15" }
+```
+
+6. Generate a report bundle:
+
+```json
+{ "app": "soundbend", "lines": 500, "deviceId": "3bf1ca15" }
+```
+
+7. Record a short video:
+
+```json
+{ "durationSec": 5, "deviceId": "3bf1ca15" }
+```
+
+The intended agent loop is: launch app, wait for UI, tap a node, capture state, generate a report when something looks wrong.
 
 ### `android_tap`
 

@@ -103,17 +103,17 @@ export function formatUiMatch(match: UiNodeMatch, index: number): string {
     ? `[${match.bounds.left},${match.bounds.top}][${match.bounds.right},${match.bounds.bottom}]`
     : "none";
   const center =
-    match.centerX !== undefined && match.centerY !== undefined ? `${match.centerX},${match.centerY}` : "none";
+    match.centerX !== undefined && match.centerY !== undefined ? `(${match.centerX},${match.centerY})` : "none";
+  const label = match.text ? `"${match.text}"` : "(no text)";
 
   return [
-    `#${index}`,
-    `text: ${match.text || ""}`,
-    `resourceId: ${match.resourceId || ""}`,
-    `class: ${match.className || ""}`,
-    `clickable: ${match.clickable ?? ""}`,
-    `enabled: ${match.enabled ?? ""}`,
-    `bounds: ${bounds}`,
-    `center: ${center}`
+    `[${index}] ${label}`,
+    `resource-id=${match.resourceId || ""}`,
+    `class=${match.className || ""}`,
+    `package=${match.packageName || ""}`,
+    `clickable=${match.clickable ?? ""}`,
+    `enabled=${match.enabled ?? ""}`,
+    `bounds=${bounds}`,
+    `center=${center}`
   ].join("\n");
 }
-
