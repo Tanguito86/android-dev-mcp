@@ -1,83 +1,83 @@
-# android-dev-mcp
+# Android Dev MCP
 
-`android-dev-mcp` is a generic Model Context Protocol server for controlling Android development apps through ADB. It is designed to work with any Android app profile.
+[![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-v0.2.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.2.0)
 
-## What it does
+Generic Android automation and inspection MCP server powered by ADB.
 
-- Lists connected ADB devices.
-- Launches and force-stops configured Android apps.
-- Clears and reads logcat, optionally filtered by profile tags.
-- Captures screenshots with `adb exec-out screencap -p`.
-- Sends taps, swipes, and text input.
-- Installs debug APKs.
-- Runs simple advanced `adb shell` commands.
+`android-dev-mcp` gives agents a small, reusable tool layer for controlling Android apps in development: launch apps, inspect UI hierarchy, tap nodes, capture screenshots, generate reports, and run declarative workflows. It uses standard ADB only.
+
+## Features
+
+- Device management with optional `deviceId`.
+- App profiles in `config/apps.json`.
+- App launch, force stop, APK install, shell commands, tap, swipe, and text input.
+- Screenshots, short screen recordings, logcat capture, and report bundles.
+- UI hierarchy dumps with `uiautomator`.
+- UI search by text, resource id, class, package, clickable, and enabled state.
+- Tap automation by UI node, text, or resource id.
+- Wait-for-UI polling with automatic failure reports.
+- Debug broadcast intents configured per app profile.
+- Declarative per-app workflows with execution reports.
 
 ## Installation
 
 Requirements:
 
 - Node.js 20 or newer.
-- Android Platform Tools installed and `adb` available in `PATH`.
-- An Android device or emulator with debugging enabled.
-
-Install dependencies:
+- Android Platform Tools installed with `adb` available in `PATH`.
+- An Android device or emulator with USB debugging enabled.
 
 ```powershell
 npm install
-```
-
-Build:
-
-```powershell
 npm run build
 ```
 
-Run in development mode:
+Development mode:
 
 ```powershell
 npm run dev
 ```
 
-## Check ADB
+Useful scripts:
 
-Verify that ADB can see your device:
+```powershell
+npm run typecheck
+npm run clean
+```
+
+## Quick Start
+
+Confirm ADB sees a device:
 
 ```powershell
 adb devices
 ```
 
-If no device appears, confirm that USB debugging is enabled and that the device authorization prompt was accepted.
-
-## Multi-device usage
-
-Most tools accept an optional `deviceId`. When omitted, ADB uses its default behavior. When provided, commands are run as `adb -s SERIAL ...`.
-
-Find serials:
+Run the MCP server:
 
 ```powershell
-adb devices
+npm run dev
 ```
 
-Example:
+Example tool calls:
 
 ```json
-{ "deviceId": "3bf1ca15" }
+{ "app": "soundbend", "deviceId": "3bf1ca15" }
 ```
 
-If a `deviceId` is not connected or is not in state `device`, the server returns a clear error with the currently available devices.
+```json
+{ "text": "Play", "clickable": true, "deviceId": "3bf1ca15" }
+```
 
-## Enable USB debugging
+```json
+{ "app": "soundbend", "workflow": "captureAudioState", "deviceId": "3bf1ca15" }
+```
 
-1. Open Android Settings.
-2. Go to About phone.
-3. Tap Build number seven times to enable Developer options.
-4. Open Developer options.
-5. Enable USB debugging.
-6. Connect the device by USB and accept the RSA authorization prompt.
+## Configuration
 
-## App profiles
-
-Profiles live in `config/apps.json`. Add one profile per Android app:
+Profiles live in `config/apps.json`.
 
 ```json
 {
@@ -85,340 +85,71 @@ Profiles live in `config/apps.json`. Add one profile per Android app:
     "myapp": {
       "package": "com.example.myapp",
       "activity": ".MainActivity",
-      "logTags": ["MyApp", "MyApp-Network"],
+      "logTags": ["MyApp"],
       "debugIntents": {
         "openDebug": "com.example.myapp.DEBUG_OPEN"
+      },
+      "workflows": {
+        "smoke": [
+          { "tool": "android_launch_app", "args": {} },
+          { "tool": "android_capture_state", "args": {} }
+        ]
       }
     }
   }
 }
 ```
 
-The profile key, such as `myapp`, is the value passed to tools that accept `app`.
-`debugIntents` is optional and maps a short agent-friendly name to an Android broadcast action.
+The profile key, such as `myapp`, is passed as `app`. SoundBend is included only as an example profile; no SoundBend behavior is hardcoded in the server.
 
-## Example profile
-
-This repository includes SoundBend as an example profile in `config/apps.json`. Use it as a template for your own app profiles:
-
-```json
-{
-  "apps": {
-    "myapp": {
-      "package": "com.example.myapp",
-      "activity": ".MainActivity",
-      "logTags": ["MyApp"]
-    }
-  }
-}
-```
-
-No app-specific logic is hardcoded in the server.
+Most tools accept optional `deviceId`. When omitted, ADB uses its default behavior. When provided, commands run as `adb -s SERIAL ...`.
 
 ## Tools
 
-### `adb_devices`
+Core ADB:
 
-Lists connected devices:
+- `adb_devices`
+- `android_launch_app`
+- `android_force_stop_app`
+- `android_install_apk`
+- `android_run_shell`
+- `android_tap`
+- `android_swipe`
+- `android_input_text`
 
-```json
-{}
-```
+Inspection:
 
-### `android_launch_app`
+- `android_clear_logcat`
+- `android_read_logcat`
+- `android_screenshot`
+- `android_ui_dump`
+- `android_capture_state`
+- `android_record_video`
+- `android_generate_report`
 
-Launches an app from `config/apps.json`:
+UI automation:
 
-```json
-{ "app": "myapp" }
-```
+- `android_find_ui`
+- `android_tap_ui`
+- `android_tap_text`
+- `android_tap_resource`
+- `android_wait_for_ui`
 
-With a specific device:
+Project automation:
 
-```json
-{ "app": "myapp", "deviceId": "3bf1ca15" }
-```
+- `android_send_debug_intent`
+- `android_run_workflow`
 
-### `android_force_stop_app`
+## Workflows
 
-Stops an app by package using its profile:
-
-```json
-{ "app": "myapp" }
-```
-
-### `android_clear_logcat`
-
-Clears logcat:
-
-```json
-{}
-```
-
-### `android_read_logcat`
-
-Reads recent logcat lines. If `tags` is omitted and `app` is provided, profile tags are used.
-
-```json
-{ "app": "myapp", "lines": 300 }
-```
-
-Manual tags:
-
-```json
-{ "tags": ["ActivityManager"], "lines": 100 }
-```
-
-### `android_screenshot`
-
-Captures a screenshot. If `outputPath` is omitted, a file is written under `screenshots/`.
-
-```json
-{ "outputPath": "screenshots/home.png" }
-```
-
-With a specific device:
-
-```json
-{ "outputPath": "screenshots/home.png", "deviceId": "3bf1ca15" }
-```
-
-### `android_ui_dump`
-
-Captures the current Android UI hierarchy using `uiautomator dump` and saves the XML under `ui-dumps/` by default.
-
-```json
-{ "deviceId": "3bf1ca15" }
-```
-
-Custom path:
-
-```json
-{ "outputPath": "ui-dumps/current.xml" }
-```
-
-### `android_capture_state`
-
-Captures a screenshot, UI dump, and metadata together under `captures/YYYY-MM-DD_HH-mm-ss/`.
-
-Generated files:
-
-- `screenshot.png`
-- `window_dump.xml`
-- `metadata.json`
-
-```json
-{ "app": "myapp", "deviceId": "3bf1ca15" }
-```
-
-### `android_record_video`
-
-Records a short screen video using `adb shell screenrecord`. The default duration is 10 seconds and the maximum is 180 seconds. Files are saved under `recordings/` by default.
-
-```json
-{ "durationSec": 10, "deviceId": "3bf1ca15" }
-```
-
-Custom path:
-
-```json
-{ "durationSec": 5, "outputPath": "recordings/quick-check.mp4" }
-```
-
-### `android_generate_report`
-
-Creates a basic debugging bundle under `reports/report_TIMESTAMP/`.
-
-Generated files:
-
-- `screenshot.png`
-- `window_dump.xml`
-- `logcat.txt`
-- `metadata.json`
-- `device-info.txt`
-
-```json
-{ "app": "myapp", "lines": 500, "deviceId": "3bf1ca15" }
-```
-
-### `android_find_ui`
-
-Dumps the current UI hierarchy, parses Android `node` elements, and searches by visible text or `resource-id`.
-
-Find a Play button:
-
-```json
-{ "text": "Play", "deviceId": "3bf1ca15" }
-```
-
-Find by resource id:
-
-```json
-{ "resourceId": "com.example.myapp:id/play_button" }
-```
-
-Results include text, resource id, clickability, bounds, and center coordinates.
-Additional filters can be combined:
+Workflows are linear JSON sequences stored in `config/apps.json`. They intentionally do not support loops, conditions, dynamic code, or scripting engines.
 
 ```json
 {
-  "text": "Play",
-  "className": "TextView",
-  "packageName": "com.example.myapp",
-  "clickable": true,
-  "enabled": true
-}
-```
-
-### `android_tap_ui`
-
-Finds a UI node and taps the center of its bounds. If multiple nodes match, the tool returns the matches and asks for an `index`.
-
-Tap on a DSP control:
-
-```json
-{ "text": "DSP", "index": 0, "deviceId": "3bf1ca15" }
-```
-
-Tap by resource id:
-
-```json
-{ "resourceId": "com.example.myapp:id/dsp_toggle" }
-```
-
-You can also filter by `className`, `packageName`, `clickable`, and `enabled`. If a tap fails because there are no matches, a node has no bounds, or an invalid index is requested, the tool creates a bundle under `failure-reports/`.
-
-### `android_tap_text`
-
-Shortcut for tapping visible text.
-
-```json
-{ "text": "Play", "index": 0, "deviceId": "3bf1ca15" }
-```
-
-### `android_tap_resource`
-
-Shortcut for tapping a node by resource id.
-
-```json
-{ "resourceId": "com.example.myapp:id/play_button", "index": 0 }
-```
-
-### `android_wait_for_ui`
-
-Polls the UI hierarchy until text or a resource id appears. Defaults: 10 seconds timeout, 1000 ms interval.
-
-Wait for text:
-
-```json
-{ "text": "Ready", "timeoutSec": 10, "intervalMs": 1000 }
-```
-
-Wait for a button by id:
-
-```json
-{ "resourceId": "com.example.myapp:id/continue_button", "timeoutSec": 20 }
-```
-
-Wait also supports `className`, `packageName`, `clickable`, and `enabled`. On timeout, it writes screenshot, UI dump, and activity metadata under `failure-reports/`.
-
-### `android_send_debug_intent`
-
-Sends a configured app debug broadcast intent from `config/apps.json`.
-
-```json
-{ "app": "myapp", "intent": "openDebug" }
-```
-
-With extras:
-
-```json
-{
-  "app": "myapp",
-  "intent": "openDebug",
-  "extras": {
-    "enabled": true,
-    "level": 3,
-    "label": "agent-check"
-  }
-}
-```
-
-Extras support simple string, number, and boolean values.
-
-## Example Agent Workflows
-
-### SoundBend inspection
-
-1. Launch SoundBend:
-
-```json
-{ "app": "soundbend", "deviceId": "3bf1ca15" }
-```
-
-2. Wait for a DSP-related UI element:
-
-```json
-{ "text": "DSP", "timeoutSec": 10, "deviceId": "3bf1ca15" }
-```
-
-3. Tap an EQ control by visible text:
-
-```json
-{ "text": "EQ", "index": 0, "deviceId": "3bf1ca15" }
-```
-
-4. Send a configured debug intent:
-
-```json
-{ "app": "soundbend", "intent": "openEq", "deviceId": "3bf1ca15" }
-```
-
-5. Capture app state:
-
-```json
-{ "app": "soundbend", "deviceId": "3bf1ca15" }
-```
-
-6. Generate a report bundle:
-
-```json
-{ "app": "soundbend", "lines": 500, "deviceId": "3bf1ca15" }
-```
-
-7. Record a short video:
-
-```json
-{ "durationSec": 5, "deviceId": "3bf1ca15" }
-```
-
-The intended agent loop is: launch app, wait for UI, tap a node, capture state, generate a report when something looks wrong.
-
-## Workflow Examples
-
-Workflows are simple linear JSON sequences stored inside each app profile in `config/apps.json`. They do not support loops, conditions, scripts, or dynamic code.
-
-Example:
-
-```json
-{
-  "workflows": {
-    "smoke": [
-      {
-        "tool": "android_launch_app",
-        "args": {}
-      },
-      {
-        "tool": "android_wait_for_ui",
-        "args": {
-          "text": "DSP"
-        }
-      },
-      {
-        "tool": "android_capture_state",
-        "args": {}
-      }
-    ]
+  "tool": "android_wait_for_ui",
+  "args": {
+    "text": "DSP",
+    "timeoutSec": 10
   }
 }
 ```
@@ -429,154 +160,101 @@ Run a workflow:
 { "app": "soundbend", "workflow": "smoke", "deviceId": "3bf1ca15" }
 ```
 
-Workflow context is propagated automatically:
+Context inheritance:
 
-- The `app` passed to `android_run_workflow` is inherited by every step.
-- The optional `deviceId` is inherited by every step.
-- A step can override inherited values by setting them explicitly in `args`.
+- `app` is inherited by each step.
+- `deviceId` is inherited by each step.
+- Step `args` can override inherited values.
 
-Each workflow run creates a folder under `workflow-reports/` with:
-
-- `workflow.json`
-- `execution-log.json`
-- `metadata.json`
-- generated screenshots, UI dumps, captures, and reports from workflow steps
-
-### SoundBend smoke
-
-```json
-{ "app": "soundbend", "workflow": "smoke", "deviceId": "3bf1ca15" }
-```
-
-Sequence:
-
-1. Launch app.
-2. Wait for `DSP`.
-3. Capture state.
-4. Generate report.
-
-### SoundBend open EQ
-
-```json
-{ "app": "soundbend", "workflow": "openEq", "deviceId": "3bf1ca15" }
-```
-
-Sequence:
-
-1. Launch app.
-2. Send configured `openEq` debug intent.
-3. Capture state.
-
-### SoundBend audio state report
-
-```json
-{ "app": "soundbend", "workflow": "captureAudioState", "deviceId": "3bf1ca15" }
-```
-
-Sequence:
-
-1. Launch app.
-2. Send configured `dumpAudio` debug intent.
-3. Capture state.
-4. Generate report.
-
-### Settings smoke
-
-```json
-{ "app": "system", "workflow": "systemUiSmoke", "deviceId": "3bf1ca15" }
-```
-
-Sequence:
-
-1. Launch Android Settings.
-2. Capture screenshot.
-3. Generate report.
-
-### `android_tap`
-
-Taps screen coordinates:
-
-```json
-{ "x": 540, "y": 1200 }
-```
-
-### `android_swipe`
-
-Swipes between screen coordinates:
-
-```json
-{ "x1": 500, "y1": 1600, "x2": 500, "y2": 400, "durationMs": 300 }
-```
-
-### `android_input_text`
-
-Types text into the focused field:
-
-```json
-{ "text": "hello world" }
-```
-
-### `android_install_apk`
-
-Installs a debug APK:
-
-```json
-{ "apkPath": "app/build/outputs/apk/debug/app-debug.apk" }
-```
-
-### `android_run_shell`
-
-Advanced tool. Runs a simple command through `adb shell`:
-
-```json
-{ "command": "settings get system screen_brightness" }
-```
-
-Use this carefully. It executes commands on the connected Android device.
+Each run writes `workflow-reports/TIMESTAMP-app-workflow/` with `workflow.json`, `execution-log.json`, `metadata.json`, and any captures generated by steps.
 
 ## Real Device Validation
 
-Validation run: 2026-05-21.
-
-Device used:
+Validated on a physical Android device:
 
 - Device ID: `3bf1ca15`
 - Model: `23129RA5FL`
 - Android version: `15`
 - Android SDK: `35`
 
-Tools verified:
+Validated capabilities include device listing, app launch, screenshots, logcat, UI dumps, UI search, tap automation, debug intents, reports, video recording, and workflows.
 
-- `adb_devices`: returned the connected physical device with state `device`.
-- `android_force_stop_app`: stopped the configured `soundbend` profile package.
-- `android_launch_app`: launched `soundbend` using the package and activity from `config/apps.json`.
-- `android_screenshot`: generated `screenshots/phase2-real-device.png`; PNG signature validated successfully.
-- `android_clear_logcat`: cleared logcat without error.
-- `android_read_logcat`: profile tag filtering executed successfully, but no matching lines were emitted for the configured tags during this run.
-- `android_tap`: executed a tap at `500,1200` without error.
-- `android_swipe`: executed a visible swipe from `500,1500` to `500,500`.
-- `android_input_text`: sent `hello_android_dev_mcp`; this requires a focused editable field in the active app.
-- `android_run_shell`: returned the device model using `getprop ro.product.model`.
+Known validation notes:
 
-Results:
+- `adb` must be available in `PATH`; on Windows it may live under `%LOCALAPPDATA%\Android\Sdk\platform-tools`.
+- Text input requires a focused editable field.
+- UI automation depends on what `uiautomator dump` exposes; it does not use OCR.
 
-- ADB control works with a physical Android device.
-- The MCP server starts cleanly and registers all expected tools.
-- The SoundBend profile works as an example app profile without server-side SoundBend hardcoding.
+## Example Agent Workflows
 
-Problems found:
+SoundBend smoke:
 
-- `adb` was installed locally but was not available in the default `PATH`; validation used the local Android SDK `platform-tools` directory.
-- The first screenshot validation found a PNG corruption bug caused by modifying binary output. The screenshot tool now writes the raw `adb exec-out screencap -p` buffer.
-- Profile log tags are valid, but the app did not emit matching log lines during the validation window.
+```json
+{ "app": "soundbend", "workflow": "smoke", "deviceId": "3bf1ca15" }
+```
 
-## Next Improvements
+Open EQ through a debug intent:
 
-- Project-level profile discovery.
-- Automation scripts.
-- Visual inspection.
-- App-specific helper scripts.
-- UI search filters by class/package/clickable state.
-- Minimal XML result summaries for agent planning.
-- Better current-activity detection from `dumpsys`.
-- Optional cleanup for temporary files on the device.
+```json
+{ "app": "soundbend", "workflow": "openEq", "deviceId": "3bf1ca15" }
+```
+
+Capture audio state:
+
+```json
+{ "app": "soundbend", "workflow": "captureAudioState", "deviceId": "3bf1ca15" }
+```
+
+Settings smoke:
+
+```json
+{ "app": "system", "workflow": "systemUiSmoke", "deviceId": "3bf1ca15" }
+```
+
+Manual UI loop:
+
+1. `android_launch_app`
+2. `android_wait_for_ui`
+3. `android_tap_ui`
+4. `android_capture_state`
+5. `android_generate_report`
+
+## Project Structure
+
+```text
+config/apps.json          App profiles, debug intents, workflows
+src/adb.ts                Central ADB wrapper
+src/appProfiles.ts        Profile loader
+src/activity.ts           Current activity detection
+src/uiParser.ts           Minimal uiautomator XML parser
+src/uiFilters.ts          UI matching helpers
+src/workflows.ts          Simple workflow runner
+src/tools/                MCP tool registrations
+```
+
+Generated artifacts are ignored by Git:
+
+- `screenshots/`
+- `ui-dumps/`
+- `captures/`
+- `recordings/`
+- `reports/`
+- `failure-reports/`
+- `workflow-reports/`
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md).
+
+## Limitations
+
+- Not Appium.
+- No OCR, OpenCV, or visual AI.
+- No accessibility service.
+- No HTTP server, WebSocket server, or daemon.
+- Workflow runner is intentionally linear and simple.
+- UI parsing is flat and based on `uiautomator` XML nodes.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

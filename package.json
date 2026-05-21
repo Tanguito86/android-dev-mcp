@@ -1,14 +1,37 @@
 {
   "name": "android-dev-mcp",
-  "version": "0.1.0",
-  "description": "Generic MCP server for controlling Android development apps through ADB.",
+  "version": "0.2.0",
+  "description": "Generic Android automation and inspection MCP server powered by ADB.",
   "type": "module",
+  "license": "MIT",
+  "author": "Tanguito86",
+  "keywords": [
+    "mcp",
+    "android",
+    "adb",
+    "automation",
+    "testing",
+    "mobile",
+    "agent",
+    "llm",
+    "android-testing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tanguito86/android-dev-mcp.git"
+  },
+  "homepage": "https://github.com/Tanguito86/android-dev-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/Tanguito86/android-dev-mcp/issues"
+  },
   "bin": {
     "android-dev-mcp": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\"",
     "start": "node dist/index.js"
   },
   "dependencies": {
