@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.5.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.5.0)
+[![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.6.0)
 
 Generic Android MCP server for automation, inspection and debugging over ADB.
 
@@ -218,6 +218,17 @@ Run:
 Workflow runs write `workflow-reports/TIMESTAMP-app-workflow/`.
 
 More detail: [Workflows](docs/workflows.md).
+
+## Stability & Compatibility
+
+The MCP API contract is documented in [API Contract](docs/api-contract.md), with version rules in [Versioning](docs/versioning.md).
+
+- Node.js: 20 or newer, CI uses Node 22.
+- Transport: MCP stdio.
+- Runtime dependency: Android SDK Platform Tools with `adb` in `PATH`.
+- Android validation: physical Android 15 device plus generic ADB workflows.
+- Compatibility: existing tool names and common inputs like `app`, `deviceId`, and `outputPath` are treated as stable.
+- Tests: minimal `node:test` coverage for parsing, profiles, workflows, validation helpers, and activity parsing.
 
 ## MCP Client Configuration
 

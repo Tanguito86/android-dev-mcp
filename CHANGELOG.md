@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [0.6.0] - 2026-05-21
+
+### Added
+
+- MCP API contract documentation covering every tool, expected inputs, outputs, examples, and common errors.
+- Versioning policy for MCP compatibility, deprecations, and breaking changes.
+- Central validation and error helpers for app profiles, workflow steps, device ids, timeouts, coordinates, and output paths.
+- Minimal `node:test` regression coverage for UI parsing, workflow validation, app profile loading, activity parsing, and validation helpers.
+- API response examples for launch, workflows, UI search, failure reports, and doctor output.
+
+### Changed
+
+- CI now runs build, typecheck, and the minimal test suite.
+- Package version bumped to `0.6.0`.
+
 ## [0.5.0] - 2026-05-21
 
 ### Added

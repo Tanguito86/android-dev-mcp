@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
+import { validateCoordinates } from "../validation.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerSwipeTool: RegisterTool = (server) => {
@@ -20,6 +21,7 @@ export const registerSwipeTool: RegisterTool = (server) => {
     },
     async ({ x1, y1, x2, y2, durationMs, deviceId }) => {
       try {
+        validateCoordinates({ x1, y1, x2, y2 }, ["x1", "y1", "x2", "y2"]);
         const resolvedDeviceId = resolveDeviceId(deviceId);
         const args: Array<string | number> = ["shell", "input", "swipe", x1, y1, x2, y2];
         if (durationMs !== undefined) {

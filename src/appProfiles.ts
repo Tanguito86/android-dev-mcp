@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { validateAppProfile } from "./validation.js";
 
 export type WorkflowStep = {
   tool: string;
@@ -47,11 +48,7 @@ export async function getAppProfile(app: string): Promise<AppProfile> {
     throw new Error(`Unknown app profile "${app}". Available profiles: ${availableApps}.`);
   }
 
-  if (!profile.package || !profile.activity) {
-    throw new Error(`App profile "${app}" must define package and activity.`);
-  }
-
-  return profile;
+  return validateAppProfile(app, profile);
 }
 
 export async function listAppProfiles(): Promise<Record<string, AppProfile>> {

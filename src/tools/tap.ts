@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { adb, formatError, formatOutput } from "../adb.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
+import { validateCoordinates } from "../validation.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
 export const registerTapTool: RegisterTool = (server) => {
@@ -17,6 +18,7 @@ export const registerTapTool: RegisterTool = (server) => {
     },
     async ({ x, y, deviceId }) => {
       try {
+        validateCoordinates({ x, y }, ["x", "y"]);
         const resolvedDeviceId = resolveDeviceId(deviceId);
         const result = await adb(["shell", "input", "tap", x, y], { deviceId: resolvedDeviceId });
         rememberSessionContext({ deviceId: resolvedDeviceId });

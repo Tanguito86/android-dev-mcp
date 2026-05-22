@@ -5,6 +5,7 @@ import { createFailureReport } from "../failureDiagnostics.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { formatUiFilters, hasAnyUiFilter } from "../uiFilters.js";
 import { formatUiMatch } from "../uiParser.js";
+import { validateIntervalMs, validateTimeoutSec } from "../validation.js";
 import { dumpAndFindUiNodes } from "./findUi.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
@@ -34,8 +35,8 @@ export const registerWaitForUiTool: RegisterTool = (server) => {
         }
 
         const resolvedDeviceId = resolveDeviceId(deviceId);
-        const timeout = timeoutSec ?? 10;
-        const interval = intervalMs ?? 1000;
+        const timeout = validateTimeoutSec(timeoutSec, 10, 300);
+        const interval = validateIntervalMs(intervalMs, 1000, 10000);
         const deadline = Date.now() + timeout * 1000;
         let lastDumpPath = "";
 

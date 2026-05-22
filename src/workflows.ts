@@ -1,11 +1,11 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { access } from "node:fs/promises";
+import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getCurrentActivity } from "./activity.js";
 import { adb, formatOutput, type AdbOptions } from "./adb.js";
 import { getAppProfile, getAppWorkflow, type WorkflowStep } from "./appProfiles.js";
 import { captureScreenshot, captureUiDump, getDeviceMetadata, timestampForPath, writeMetadata } from "./inspection.js";
 import { dumpAndFindUiNodes } from "./tools/findUi.js";
+import { validateWorkflowStepShape } from "./validation.js";
 
 type WorkflowContext = {
   app: string;
@@ -72,13 +72,7 @@ function appendExtra(args: Array<string | number>, key: string, value: unknown):
 }
 
 function mergeStepArgs(step: WorkflowStep, context: WorkflowContext, index: number): Record<string, unknown> {
-  if (!step || typeof step !== "object" || typeof step.tool !== "string") {
-    throw new Error(`Workflow step ${index} must define a string tool.`);
-  }
-
-  if (step.args !== undefined && (typeof step.args !== "object" || Array.isArray(step.args) || step.args === null)) {
-    throw new Error(`Workflow step ${index} args must be an object.`);
-  }
+  validateWorkflowStepShape(step, index);
 
   return {
     app: context.app,
@@ -259,17 +253,11 @@ const executors: Record<string, StepExecutor> = {
 
 export function validateWorkflowSteps(steps: WorkflowStep[]): void {
   steps.forEach((step, index) => {
-    if (!step || typeof step !== "object" || typeof step.tool !== "string") {
-      throw new Error(`Workflow step ${index} must define a string tool.`);
-    }
+    validateWorkflowStepShape(step, index);
 
     if (!executors[step.tool]) {
       const available = Object.keys(executors).sort().join(", ");
       throw new Error(`Workflow step ${index} uses unknown or unsupported tool "${step.tool}". Supported tools: ${available}.`);
-    }
-
-    if (step.args !== undefined && (typeof step.args !== "object" || step.args === null || Array.isArray(step.args))) {
-      throw new Error(`Workflow step ${index} args must be an object.`);
     }
   });
 }

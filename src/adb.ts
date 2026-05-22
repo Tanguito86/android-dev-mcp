@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { formatContractError } from "./errors.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -129,9 +130,5 @@ export function formatOutput(title: string, output: AdbResult): string {
 }
 
 export function formatError(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return String(error);
+  return formatContractError(error);
 }
