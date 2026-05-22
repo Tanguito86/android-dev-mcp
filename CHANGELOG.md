@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [0.7.0] - 2026-05-22
+
+### Added
+
+- npm publication checklist for maintainers.
+- README npm installation guidance for future global and `npx` usage.
+- MCP client setup examples for global install, `npx`, and local node paths.
+- Privacy and security documentation covering local-only ADB behavior.
+
+### Changed
+
+- Package version bumped to `0.7.0`.
+- Publish dry-run validation now documents package size and included files.
+- Removed real screenshot PNG assets from package contents to keep publication lighter.
+
 ## [0.6.0] - 2026-05-21
 
 ### Added

@@ -1,6 +1,6 @@
 {
   "name": "android-dev-mcp",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Generic Android automation and inspection MCP server powered by ADB.",
   "type": "module",
   "license": "MIT",

@@ -1,5 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { validateAppProfile } from "./validation.js";
 
 export type WorkflowStep = {
@@ -19,12 +20,32 @@ type AppsConfig = {
   apps: Record<string, AppProfile>;
 };
 
-const configPath = path.resolve(process.cwd(), "config", "apps.json");
+const localConfigPath = path.resolve(process.cwd(), "config", "apps.json");
+const bundledConfigPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "config", "apps.json");
 
 let cachedConfig: AppsConfig | undefined;
+let cachedConfigPath: string | undefined;
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveConfigPath(): Promise<string> {
+  if (await fileExists(localConfigPath)) {
+    return localConfigPath;
+  }
+
+  return bundledConfigPath;
+}
 
 async function loadConfig(): Promise<AppsConfig> {
-  if (cachedConfig) {
+  const configPath = await resolveConfigPath();
+  if (cachedConfig && cachedConfigPath === configPath) {
     return cachedConfig;
   }
 
@@ -36,6 +57,7 @@ async function loadConfig(): Promise<AppsConfig> {
   }
 
   cachedConfig = parsedConfig;
+  cachedConfigPath = configPath;
   return parsedConfig;
 }
 

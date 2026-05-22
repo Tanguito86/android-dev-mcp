@@ -15,6 +15,56 @@ npm install
 npm run build
 ```
 
+## Installation Modes
+
+Local repository build:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": [
+        "C:/Users/Deposito/Documents/android-dev-mcp/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+Future global npm install:
+
+```powershell
+npm install -g android-dev-mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "android-dev-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+Future `npx` usage:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "android-dev-mcp"
+      ]
+    }
+  }
+}
+```
+
 ## Claude Desktop
 
 ```json
@@ -30,7 +80,7 @@ npm run build
 }
 ```
 
-Future installed binary form:
+Installed binary form after npm publication:
 
 ```json
 {
@@ -100,4 +150,3 @@ If installed globally in the future:
   }
 }
 ```
-

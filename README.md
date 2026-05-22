@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.6.0)
+[![Version](https://img.shields.io/badge/version-v0.7.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.7.0)
 
 Generic Android MCP server for automation, inspection and debugging over ADB.
 
@@ -60,6 +60,25 @@ npm run typecheck
 npm run clean
 npm run doctor
 ```
+
+## npm Installation
+
+`android-dev-mcp` is prepared for npm publication but is not published until a maintainer explicitly runs `npm publish`.
+
+Once published:
+
+```powershell
+npm install -g android-dev-mcp
+android-dev-mcp
+```
+
+Future one-off usage:
+
+```powershell
+npx android-dev-mcp
+```
+
+Both forms require Android SDK Platform Tools and `adb` in `PATH`, plus an authorized Android device or emulator.
 
 ## 5 Minute Setup
 
@@ -159,6 +178,8 @@ For a clean starting point, copy one of:
 - `templates/apps.with-workflows.json`
 
 More detail: [Add Your Android App](docs/add-your-app.md).
+
+When installed globally, the bundled example config is used if the current working directory does not contain `config/apps.json`. Add a project-local `config/apps.json` to override the bundled examples.
 
 ## Tools
 
@@ -274,21 +295,6 @@ Debug intents are optional broadcast actions implemented by your app and configu
 
 More detail and Kotlin/Java examples: [Debug Intents](docs/debug-intents.md).
 
-## Future npm Usage
-
-The package is npm-ready but not published yet.
-
-```powershell
-npx android-dev-mcp
-```
-
-or:
-
-```powershell
-npm install -g android-dev-mcp
-android-dev-mcp
-```
-
 ## Real Device Validation
 
 Validated on a physical Android device:
@@ -300,14 +306,6 @@ Validated on a physical Android device:
 Validated capabilities include device listing, app launch, screenshots, logcat, UI dumps, UI search, tap automation, debug intents, reports, video recording, package installation checks, and workflows.
 
 ## Example Images
-
-Workflow report screenshot:
-
-![Workflow report](docs/images/workflow-report.png)
-
-Capture state screenshot:
-
-![Capture state](docs/images/capture-state.png)
 
 UI dump example:
 
@@ -344,6 +342,15 @@ Generated artifacts are ignored by Git:
 - `reports/`
 - `failure-reports/`
 - `workflow-reports/`
+
+## Privacy & Security
+
+- Local-only MCP stdio server.
+- Uses standard ADB commands only.
+- Does not send data to cloud services.
+- No telemetry, analytics, tracking, or external API calls.
+- Does not open HTTP ports, WebSocket ports, or background network daemons.
+- Generated screenshots, dumps, recordings, reports, and workflow artifacts stay on your machine and are ignored by Git.
 
 ## Roadmap
 
