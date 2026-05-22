@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.2.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.2.0)
+[![Version](https://img.shields.io/badge/version-v0.3.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.3.0)
 
 Generic Android automation and inspection MCP server powered by ADB.
 
@@ -45,6 +45,119 @@ Useful scripts:
 ```powershell
 npm run typecheck
 npm run clean
+```
+
+## MCP Client Configuration
+
+All clients need Android SDK Platform Tools installed, `adb` available in `PATH`, USB debugging enabled, and the phone/emulator authorized.
+
+### Claude Desktop
+
+Use the built local `dist/index.js` path:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": [
+        "C:/Users/Deposito/Documents/android-dev-mcp/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+After future npm installation, the binary form can be used:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "android-dev-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+### Cursor
+
+Use the same stdio server shape in Cursor's MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": [
+        "C:/Users/Deposito/Documents/android-dev-mcp/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+### OpenCode
+
+Use a stdio MCP server entry:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": [
+        "C:/Users/Deposito/Documents/android-dev-mcp/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+### Generic MCP stdio client
+
+Local build:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/android-dev-mcp/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+Binary form:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "android-dev-mcp",
+      "args": []
+    }
+  }
+}
+```
+
+## Future npm usage
+
+This package is prepared for npm distribution, but it is not published yet. Once published, expected usage will be:
+
+```powershell
+npx android-dev-mcp
+```
+
+or:
+
+```powershell
+npm install -g android-dev-mcp
+android-dev-mcp
 ```
 
 ## Quick Start

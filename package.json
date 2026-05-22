@@ -1,6 +1,6 @@
 {
   "name": "android-dev-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Generic Android automation and inspection MCP server powered by ADB.",
   "type": "module",
   "license": "MIT",
@@ -24,9 +24,18 @@
   "bugs": {
     "url": "https://github.com/Tanguito86/android-dev-mcp/issues"
   },
+  "main": "dist/index.js",
   "bin": {
-    "android-dev-mcp": "./dist/index.js"
+    "android-dev-mcp": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "config",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "ROADMAP.md"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",

@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [0.3.0] - 2026-05-21
+
+### Added
+
+- npm package readiness metadata, including `main`, `bin`, and package `files`.
+- MCP client configuration documentation for Claude Desktop, Cursor, OpenCode, and generic stdio clients.
+- Future npm usage documentation without publishing the package.
+- Clean install and local package validation flow.
+
+### Changed
+
+- CI now uses Node 22 and runs both build and typecheck.
+- Package version bumped to `0.3.0`.
+
 ## [0.2.0] - 2026-05-21
 
 ### Added

@@ -8,3 +8,4 @@ reports/
 failure-reports/
 workflow-reports/
 npm-debug.log*
+*.tgz
