@@ -54,6 +54,11 @@ export async function getAppProfile(app: string): Promise<AppProfile> {
   return profile;
 }
 
+export async function listAppProfiles(): Promise<Record<string, AppProfile>> {
+  const config = await loadConfig();
+  return config.apps;
+}
+
 export async function getAppWorkflow(app: string, workflow: string): Promise<WorkflowStep[]> {
   const profile = await getAppProfile(app);
   const steps = profile.workflows?.[workflow];

@@ -2,11 +2,24 @@
 
 [![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.4.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.4.0)
+[![Version](https://img.shields.io/badge/version-v0.5.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.5.0)
 
 Generic Android MCP server for automation, inspection and debugging over ADB.
 
 `android-dev-mcp` is a reusable MCP stdio server for Android development. It is designed for any Android app profile: internal apps, sample apps, games, QA builds, debug builds, and local experiments. It uses standard ADB only.
+
+## What can this MCP do?
+
+- Launch and stop Android apps.
+- Inspect UI with `uiautomator` XML dumps.
+- Find and tap UI nodes by text or resource id.
+- Capture screenshots and short videos.
+- Read and clear logcat.
+- Install APKs.
+- Run ADB shell commands.
+- Send app-defined debug intents.
+- Generate debugging reports.
+- Run reusable workflows.
 
 ## Features
 
@@ -45,7 +58,53 @@ Useful scripts:
 ```powershell
 npm run typecheck
 npm run clean
+npm run doctor
 ```
+
+## 5 Minute Setup
+
+1. Install Android SDK Platform Tools.
+2. Enable USB debugging on your Android device.
+3. Connect the phone and accept the authorization prompt.
+4. Confirm ADB:
+
+```powershell
+adb devices
+```
+
+5. Install and build:
+
+```powershell
+npm install
+npm run build
+```
+
+6. Run the doctor:
+
+```powershell
+npm run doctor
+```
+
+7. Configure your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "android-dev-mcp": {
+      "command": "node",
+      "args": ["C:/path/to/android-dev-mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+8. Run a first workflow:
+
+```json
+{ "app": "system", "workflow": "systemUiSmoke", "deviceId": "SERIAL" }
+```
+
+See [MCP Client Setup](docs/mcp-client-setup.md) and [Troubleshooting](docs/troubleshooting.md).
 
 ## Quick Start
 
@@ -229,6 +288,24 @@ Validated on a physical Android device:
 
 Validated capabilities include device listing, app launch, screenshots, logcat, UI dumps, UI search, tap automation, debug intents, reports, video recording, package installation checks, and workflows.
 
+## Example Images
+
+Workflow report screenshot:
+
+![Workflow report](docs/images/workflow-report.png)
+
+Capture state screenshot:
+
+![Capture state](docs/images/capture-state.png)
+
+UI dump example:
+
+![UI dump example](docs/images/ui-dump-example.svg)
+
+MCP config example:
+
+![MCP config example](docs/images/mcp-config-example.svg)
+
 ## Example Profiles
 
 SoundBend remains in `config/apps.json` as an example profile only. It demonstrates log tags, debug intents, and workflows, but the MCP server contains no SoundBend-specific logic.
@@ -260,6 +337,11 @@ Generated artifacts are ignored by Git:
 ## Roadmap
 
 See [ROADMAP.md](ROADMAP.md).
+
+## Community
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Limitations
 

@@ -9,6 +9,8 @@ import { registerForceStopAppTool } from "./tools/forceStopApp.js";
 import { registerInputTextTool } from "./tools/inputText.js";
 import { registerInstallApkTool } from "./tools/installApk.js";
 import { registerLaunchAppTool } from "./tools/launchApp.js";
+import { registerListAppsTool } from "./tools/listApps.js";
+import { registerListWorkflowsTool } from "./tools/listWorkflows.js";
 import { registerLogcatTools } from "./tools/logcat.js";
 import { registerRecordVideoTool } from "./tools/recordVideo.js";
 import { registerReportTool } from "./tools/report.js";
@@ -25,10 +27,12 @@ import { registerWaitForUiTool } from "./tools/waitForUi.js";
 
 const server = new McpServer({
   name: "android-dev-mcp",
-  version: "0.1.0"
+  version: "0.5.0"
 });
 
 registerDevicesTool(server);
+registerListAppsTool(server);
+registerListWorkflowsTool(server);
 registerLaunchAppTool(server);
 registerForceStopAppTool(server);
 registerLogcatTools(server);

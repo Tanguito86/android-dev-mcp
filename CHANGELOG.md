@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [0.5.0] - 2026-05-21
+
+### Added
+
+- `npm run doctor` onboarding checks for Node.js, ADB, connected devices, config, and build output.
+- MCP discovery tools: `android_list_apps` and `android_list_workflows`.
+- Troubleshooting, contributing, and code of conduct documentation.
+- First-run README sections for five-minute setup and MCP capability discovery.
+- Lightweight documentation images for onboarding examples.
+
+### Changed
+
+- Package version bumped to `0.5.0`.
+- Package files now include onboarding scripts.
+
 ## [0.4.0] - 2026-05-21
 
 ### Added
