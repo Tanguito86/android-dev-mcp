@@ -1,6 +1,137 @@
 {
   "apps": {
+    "sampleApp": {
+      "package": "com.example.myapp",
+      "activity": ".MainActivity",
+      "logTags": [
+        "MyApp"
+      ],
+      "workflows": {
+        "appSmoke": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_capture_state",
+            "args": {}
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 300
+            }
+          }
+        ],
+        "launchAndCapture": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_capture_state",
+            "args": {}
+          }
+        ],
+        "uiSnapshot": [
+          {
+            "tool": "android_screenshot",
+            "args": {}
+          },
+          {
+            "tool": "android_ui_dump",
+            "args": {}
+          }
+        ],
+        "logcatSnapshot": [
+          {
+            "tool": "android_clear_logcat",
+            "args": {}
+          },
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_read_logcat",
+            "args": {
+              "lines": 300
+            }
+          }
+        ],
+        "installAndLaunch": [
+          {
+            "tool": "android_install_apk",
+            "args": {
+              "apkPath": "app/build/outputs/apk/debug/app-debug.apk"
+            }
+          },
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          }
+        ]
+      }
+    },
+    "demoDebugApp": {
+      "package": "com.example.debugapp",
+      "activity": ".MainActivity",
+      "logTags": [
+        "DemoDebugApp",
+        "DemoDebugApp-Network"
+      ],
+      "debugIntents": {
+        "openDebugPanel": "com.example.debugapp.DEBUG_OPEN_PANEL",
+        "dumpState": "com.example.debugapp.DEBUG_DUMP_STATE"
+      },
+      "workflows": {
+        "debugCapture": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_send_debug_intent",
+            "args": {
+              "intent": "dumpState"
+            }
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 500
+            }
+          }
+        ]
+      }
+    },
+    "system": {
+      "package": "com.android.settings",
+      "activity": ".Settings",
+      "logTags": [
+        "Settings"
+      ],
+      "workflows": {
+        "systemUiSmoke": [
+          {
+            "tool": "android_launch_app",
+            "args": {}
+          },
+          {
+            "tool": "android_screenshot",
+            "args": {}
+          },
+          {
+            "tool": "android_generate_report",
+            "args": {
+              "lines": 200
+            }
+          }
+        ]
+      }
+    },
     "soundbend": {
+      "description": "Example profile only. Replace with your own app profile for real projects.",
       "package": "com.tanguitostudio.soundbend",
       "activity": ".MainActivity",
       "logTags": [
@@ -71,31 +202,6 @@
             "tool": "android_generate_report",
             "args": {
               "lines": 500
-            }
-          }
-        ]
-      }
-    },
-    "system": {
-      "package": "com.android.settings",
-      "activity": ".Settings",
-      "logTags": [
-        "Settings"
-      ],
-      "workflows": {
-        "systemUiSmoke": [
-          {
-            "tool": "android_launch_app",
-            "args": {}
-          },
-          {
-            "tool": "android_screenshot",
-            "args": {}
-          },
-          {
-            "tool": "android_generate_report",
-            "args": {
-              "lines": 200
             }
           }
         ]

@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [0.4.0] - 2026-05-21
+
+### Added
+
+- General-purpose app profile examples for standard apps, debug apps, logcat usage, and workflows.
+- Reusable `templates/` for basic app profiles, logcat profiles, debug intents, and workflows.
+- Dedicated docs for adding Android apps, MCP client setup, debug intents, and workflows.
+- Generic workflow examples such as `appSmoke`, `launchAndCapture`, `uiSnapshot`, `logcatSnapshot`, `installAndLaunch`, and `debugCapture`.
+
+### Changed
+
+- README now presents `android-dev-mcp` as a general Android MCP toolkit first.
+- SoundBend is documented only as an example profile and optional workflow example.
+- npm package files now include `docs/` and `templates/`.
+
 ## [0.3.0] - 2026-05-21
 
 ### Added

@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { access } from "node:fs/promises";
 import path from "node:path";
 import { getCurrentActivity } from "./activity.js";
 import { adb, formatOutput, type AdbOptions } from "./adb.js";
@@ -215,13 +216,43 @@ async function runShell(args: Record<string, unknown>, context: WorkflowContext)
   return { output: formatOutput(`Ran shell command: ${command}`, result) };
 }
 
+async function runInstallApk(args: Record<string, unknown>, context: WorkflowContext): Promise<ExecutorResult> {
+  const apkPath = readString(args, "apkPath");
+  if (!apkPath) {
+    throw new Error("android_install_apk requires apkPath.");
+  }
+
+  await access(apkPath);
+  const result = await adb(["install", "-r", apkPath], { deviceId: readString(args, "deviceId") ?? context.deviceId });
+  return { output: formatOutput(`Installed APK: ${apkPath}`, result) };
+}
+
+async function runClearLogcat(args: Record<string, unknown>, context: WorkflowContext): Promise<ExecutorResult> {
+  await adb(["logcat", "-c"], { deviceId: readString(args, "deviceId") ?? context.deviceId });
+  return { output: "Logcat cleared." };
+}
+
+async function runReadLogcat(args: Record<string, unknown>, context: WorkflowContext, index: number): Promise<ExecutorResult> {
+  const outputPath = readString(args, "outputPath") ?? path.join(context.reportDir, "logcat", `step-${index}.txt`);
+  const result = await adb(["logcat", "-d", "-t", readNumber(args, "lines") ?? 300], {
+    deviceId: readString(args, "deviceId") ?? context.deviceId
+  });
+
+  await mkdir(path.dirname(path.resolve(process.cwd(), outputPath)), { recursive: true });
+  await writeFile(path.resolve(process.cwd(), outputPath), result.stdout, "utf8");
+  return { output: `Logcat saved to ${outputPath}`, paths: [outputPath] };
+}
+
 const executors: Record<string, StepExecutor> = {
   android_launch_app: runLaunchApp,
+  android_install_apk: runInstallApk,
   android_wait_for_ui: runWaitForUi,
   android_capture_state: runCaptureState,
   android_generate_report: runGenerateReport,
   android_screenshot: runScreenshot,
   android_ui_dump: runUiDump,
+  android_clear_logcat: runClearLogcat,
+  android_read_logcat: runReadLogcat,
   android_send_debug_intent: runDebugIntent,
   android_run_shell: runShell
 };

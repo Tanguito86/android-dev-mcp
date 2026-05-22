@@ -1,6 +1,6 @@
 {
   "name": "android-dev-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Generic Android automation and inspection MCP server powered by ADB.",
   "type": "module",
   "license": "MIT",
@@ -31,6 +31,8 @@
   "files": [
     "dist",
     "config",
+    "docs",
+    "templates",
     "README.md",
     "CHANGELOG.md",
     "LICENSE",

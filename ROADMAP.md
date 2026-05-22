@@ -8,6 +8,7 @@ This roadmap is intentionally practical. `android-dev-mcp` should stay small, AD
 - Better UI parsing summaries and filters.
 - Recording improvements and easier artifact cleanup.
 - More workflow examples for common Android development tasks.
+- More reusable templates for common Android app architectures.
 
 ## Later
 
@@ -16,6 +17,7 @@ This roadmap is intentionally practical. `android-dev-mcp` should stay small, AD
 - Workflow conditions with strict, declarative semantics.
 - Plugin system for project-specific workflow packs.
 - Better current activity and task stack reporting.
+- Optional project-local profile discovery.
 
 ## Not Planned
 
