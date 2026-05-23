@@ -32,10 +32,10 @@ Local repository build:
 }
 ```
 
-Future global npm install:
+Global npm install:
 
 ```powershell
-npm install -g android-dev-mcp
+npm install -g @tanguito/android-dev-mcp
 ```
 
 ```json
@@ -58,7 +58,7 @@ Future `npx` usage:
       "command": "npx",
       "args": [
         "-y",
-        "android-dev-mcp"
+        "@tanguito/android-dev-mcp"
       ]
     }
   }

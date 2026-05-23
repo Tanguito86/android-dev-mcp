@@ -27,7 +27,7 @@ import { registerWaitForUiTool } from "./tools/waitForUi.js";
 
 const server = new McpServer({
   name: "android-dev-mcp",
-  version: "0.7.0"
+  version: "1.0.0"
 });
 
 registerDevicesTool(server);

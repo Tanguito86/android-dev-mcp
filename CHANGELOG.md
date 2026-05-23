@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [1.0.0] - 2026-05-22
+
+### Added
+
+- First public npm release metadata and installation documentation.
+- npm badge and package link in the README.
+- Post-publish checklist for visibility, install, `npx`, MCP smoke validation, and feedback monitoring.
+- Scoped npm package name: `@tanguito/android-dev-mcp`.
+
+### Changed
+
+- Package version bumped to `1.0.0`.
+- README now documents npm install and `npx` usage as public distribution paths.
+
 ## [0.7.0] - 2026-05-22
 
 ### Added

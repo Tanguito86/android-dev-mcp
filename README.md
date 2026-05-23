@@ -1,8 +1,9 @@
 # Android Dev MCP
 
 [![CI](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Tanguito86/android-dev-mcp/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@tanguito/android-dev-mcp.svg)](https://www.npmjs.com/package/@tanguito/android-dev-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.7.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v0.7.0)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/Tanguito86/android-dev-mcp/releases/tag/v1.0.0)
 
 Generic Android MCP server for automation, inspection and debugging over ADB.
 
@@ -63,22 +64,22 @@ npm run doctor
 
 ## npm Installation
 
-`android-dev-mcp` is prepared for npm publication but is not published until a maintainer explicitly runs `npm publish`.
-
-Once published:
+Install from npm:
 
 ```powershell
-npm install -g android-dev-mcp
+npm install -g @tanguito/android-dev-mcp
 android-dev-mcp
 ```
 
-Future one-off usage:
+One-off usage:
 
 ```powershell
-npx android-dev-mcp
+npx @tanguito/android-dev-mcp
 ```
 
 Both forms require Android SDK Platform Tools and `adb` in `PATH`, plus an authorized Android device or emulator.
+
+npm package: [@tanguito/android-dev-mcp](https://www.npmjs.com/package/@tanguito/android-dev-mcp)
 
 ## 5 Minute Setup
 

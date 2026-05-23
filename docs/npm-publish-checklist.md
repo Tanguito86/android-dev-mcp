@@ -4,9 +4,9 @@ Use this checklist before any public npm publication.
 
 ## Name
 
-- Run `npm view android-dev-mcp`.
-- Current validation result: npm returned `E404` and reported the package as unpublished on `2026-02-07`.
+- Historical note: `npm view android-dev-mcp` returned `E404` and reported the package as unpublished on `2026-02-07`.
 - Treat the name as currently unavailable for install but historically used. Confirm ownership and npm policy before publishing.
+- First public release uses the scoped package `@tanguito/android-dev-mcp` because the unscoped name is blocked by npm permissions.
 - If the name cannot be used, consider:
   - `android-dev-mcp-cli`
   - `adb-android-mcp`
@@ -61,7 +61,7 @@ Use this checklist before any public npm publication.
 - Only after explicit maintainer approval, run:
 
 ```powershell
-npm publish
+npm publish --access public
 ```
 
 Do not publish from a dirty working tree.
