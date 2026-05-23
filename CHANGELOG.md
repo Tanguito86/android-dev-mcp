@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [1.0.1] - 2026-05-22
+
+### Changed
+
+- Updated the SoundBend example `smoke` workflow to wait for the real visible UI text `Reproduciendo`.
+
+### Validated
+
+- SoundBend `smoke` workflow passes on a physical Android device using the updated profile.
+
 ## [1.0.0] - 2026-05-22
 
 ### Added

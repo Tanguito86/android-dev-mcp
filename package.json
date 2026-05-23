@@ -1,6 +1,6 @@
 {
   "name": "@tanguito/android-dev-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generic Android automation and inspection MCP server powered by ADB.",
   "type": "module",
   "license": "MIT",
