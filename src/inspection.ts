@@ -2,6 +2,7 @@ import { mkdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getCurrentActivity } from "./activity.js";
 import { adb, adbBinary, type AdbOptions } from "./adb.js";
+import { toAdbHostPath } from "./pathUtils.js";
 
 const REMOTE_UI_DUMP_PATH = "/sdcard/window_dump.xml";
 
@@ -57,7 +58,7 @@ export async function captureUiDump(outputPath: string, options: AdbOptions = {}
 
   await mkdir(path.dirname(resolvedPath), { recursive: true });
   await adb(["shell", "uiautomator", "dump", REMOTE_UI_DUMP_PATH], options);
-  await adb(["pull", REMOTE_UI_DUMP_PATH, resolvedPath], options);
+  await adb(["pull", REMOTE_UI_DUMP_PATH, toAdbHostPath(resolvedPath)], options);
 
   return fileSize(resolvedPath);
 }

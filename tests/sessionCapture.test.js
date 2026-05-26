@@ -297,3 +297,67 @@ test("appendAction auto-increments step number from metadata", () => {
   assert.equal(nextStep(), 3);
   assert.equal(meta.stepCount, 3);
 });
+
+// ── WSL path translation (Fase 17D) ──
+
+test("toAdbHostPath translates /mnt/c/... to C:\\...", () => {
+  const toAdbHostPath = (localPath) => {
+    const wslMatch = localPath.match(/^\/mnt\/([a-zA-Z])\/(.*)$/);
+    if (wslMatch) {
+      const drive = wslMatch[1].toUpperCase();
+      const rest = wslMatch[2].replace(/\//g, "\\");
+      return `${drive}:\\${rest}`;
+    }
+    if (/^[a-zA-Z]:\\/.test(localPath)) return localPath;
+    if (/^[a-zA-Z]:\//.test(localPath)) return localPath.replace(/\//g, "\\");
+    return localPath;
+  };
+
+  // WSL paths → Windows
+  assert.equal(
+    toAdbHostPath("/mnt/c/Users/Deposito/file.xml"),
+    "C:\\Users\\Deposito\\file.xml"
+  );
+  assert.equal(
+    toAdbHostPath("/mnt/h/DEV/AGENTE/out.xml"),
+    "H:\\DEV\\AGENTE\\out.xml"
+  );
+  assert.equal(
+    toAdbHostPath("/mnt/c/Users/Deposito/Documents/android-dev-mcp/sessions/test/ui-dumps/step-1.xml"),
+    "C:\\Users\\Deposito\\Documents\\android-dev-mcp\\sessions\\test\\ui-dumps\\step-1.xml"
+  );
+
+  // Windows paths pass through
+  assert.equal(
+    toAdbHostPath("C:\\Users\\Deposito\\file.xml"),
+    "C:\\Users\\Deposito\\file.xml"
+  );
+  assert.equal(
+    toAdbHostPath("D:\\Projects\\test.xml"),
+    "D:\\Projects\\test.xml"
+  );
+
+  // Windows forward-slash → backslash
+  assert.equal(
+    toAdbHostPath("C:/Users/Deposito/file.xml"),
+    "C:\\Users\\Deposito\\file.xml"
+  );
+
+  // Relative paths unchanged
+  assert.equal(toAdbHostPath("sessions/test/file.xml"), "sessions/test/file.xml");
+  assert.equal(toAdbHostPath("relative/path/file.xml"), "relative/path/file.xml");
+
+  // Non-WSL Linux paths unchanged
+  assert.equal(toAdbHostPath("/home/user/file.xml"), "/home/user/file.xml");
+  assert.equal(toAdbHostPath("/tmp/test.xml"), "/tmp/test.xml");
+
+  // Edge: drive letter preserved case-insensitively
+  assert.equal(
+    toAdbHostPath("/mnt/C/Users/Test/file.xml"),
+    "C:\\Users\\Test\\file.xml"
+  );
+  assert.equal(
+    toAdbHostPath("/mnt/d/data/out.log"),
+    "D:\\data\\out.log"
+  );
+});

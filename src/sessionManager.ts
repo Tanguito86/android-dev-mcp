@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile, appendFile } from "node:fs/promises";
 import path from "node:path";
 import { getCurrentActivity } from "./activity.js";
 import { adb, type AdbOptions } from "./adb.js";
@@ -174,7 +174,7 @@ export async function appendAction(
   };
 
   const actionsPath = path.join(dir, "actions.jsonl");
-  await writeFile(actionsPath, JSON.stringify(entry) + "\n", "utf8");
+  await appendFile(actionsPath, JSON.stringify(entry) + "\n", "utf8");
 
   // Update step count in metadata
   meta.stepCount = step;

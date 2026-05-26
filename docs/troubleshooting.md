@@ -104,3 +104,13 @@ adb version
 
 If `adb` works only in one terminal, add Platform Tools to the system or user PATH, then restart the MCP client.
 
+## WSL + Windows ADB path translation
+
+When running `android-dev-mcp` under WSL with the Windows `adb.exe` binary, local file paths passed to `adb pull` or `adb push` must use Windows host notation (`C:\Users\...`) instead of WSL notation (`/mnt/c/Users/...`). `android-dev-mcp` automatically translates WSL paths to Windows paths via the `toAdbHostPath()` utility in `src/pathUtils.ts`.
+
+This affects:
+- `captureUiDump` (UI hierarchy dumps)
+- `android_record_video` (pulling video recordings)
+
+If you see `adb: error: cannot create file/directory '/mnt/c/...'` errors, ensure you're running the latest version (≥ v1.1.0 with the WSL path fix applied).
+

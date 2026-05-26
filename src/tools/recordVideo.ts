@@ -3,6 +3,7 @@ import path from "node:path";
 import { z } from "zod";
 import { adb, formatError } from "../adb.js";
 import { fileSize, timestampForPath } from "../inspection.js";
+import { toAdbHostPath } from "../pathUtils.js";
 import { rememberSessionContext, resolveDeviceId } from "../sessionContext.js";
 import { textResponse, type RegisterTool } from "./types.js";
 
@@ -30,7 +31,7 @@ export const registerRecordVideoTool: RegisterTool = (server) => {
         await mkdir(path.dirname(resolvedPath), { recursive: true });
         await adb(["shell", "rm", "-f", REMOTE_VIDEO_PATH], { deviceId: resolvedDeviceId });
         await adb(["shell", "screenrecord", "--time-limit", duration, REMOTE_VIDEO_PATH], { deviceId: resolvedDeviceId });
-        await adb(["pull", REMOTE_VIDEO_PATH, resolvedPath], { deviceId: resolvedDeviceId });
+        await adb(["pull", REMOTE_VIDEO_PATH, toAdbHostPath(resolvedPath)], { deviceId: resolvedDeviceId });
         const size = await fileSize(resolvedPath);
         rememberSessionContext({ deviceId: resolvedDeviceId });
 

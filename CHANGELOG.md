@@ -29,6 +29,10 @@ This project follows a simple Keep a Changelog style.
 ### Changed
 - `android_run_workflow` — now accepts optional `session`, `sessionName`, `captureSteps`, `captureUiDumps`, `clearLogcat` parameters for automatic evidence capture.
 
+### Fixed
+- `captureUiDump` and `android_record_video` — `adb pull` local paths are now translated from WSL notation to Windows host paths when running under WSL with a Windows `adb.exe`. Previously caused "No such file or directory" errors.
+- `appendAction` in session manager — now correctly appends to `actions.jsonl` instead of overwriting the file (switched from `writeFile` to `appendFile`).
+
 ## [1.0.1] - 2026-05-22
 
 ### Changed
