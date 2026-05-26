@@ -20,6 +20,11 @@ This project follows a simple Keep a Changelog style.
 - `android_uninstall_app` — uninstalls an app via `pm uninstall` with optional `-k` to keep data.
 - `android_start_activity` — launches an arbitrary Android component via `am start` (no profile needed).
 - `android_send_intent` — sends a generic broadcast intent with `--es`, `--ei`, `--ez` extras.
+- `android_start_session` — creates a timestamped testing session with device info capture and optional logcat clear.
+- `android_session_step` — records an action within a session with optional screenshot and UI dump evidence.
+- `android_stop_session` — finalizes a session: captures logcat, current app, and generates final-report.md.
+- `android_list_sessions` — lists existing sessions with name, status, step count, and duration.
+- `android_get_session_report` — reads the final-report.md for a completed session.
 
 ## [1.0.1] - 2026-05-22
 

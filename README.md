@@ -236,6 +236,14 @@ App lifecycle:
 - `android_start_activity`
 - `android_send_intent`
 
+Session capture:
+
+- `android_start_session`
+- `android_session_step`
+- `android_stop_session`
+- `android_list_sessions`
+- `android_get_session_report`
+
 ## Workflows
 
 Workflows are linear JSON sequences. They do not support loops, conditions, dynamic code, or eval.

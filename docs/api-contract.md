@@ -804,3 +804,117 @@ Common errors:
 - No broadcast receivers registered for this intent action.
 - Permission denial (intent requires a permission not granted).
 - Invalid extras types (only string, number, boolean supported).
+
+## android_start_session
+
+Creates a timestamped session directory for evidence capture. Optionally clears logcat and records device info.
+
+Inputs:
+- `name?: string` — human-readable label (sanitized for filenames)
+- `clearLogcat?: boolean` — clear logcat buffer on start (default: true)
+- `app?: string` — config profile name to associate
+- `deviceId?: string`
+
+Expected output:
+```
+sessionId: 2026-05-26_18-30-15_smoke-test
+sessionDir: sessions/2026-05-26_18-30-15_smoke-test
+name: smoke-test
+device: SM-S908B, Android 14 (SDK 34)
+logcatCleared: true
+startedAt: 2026-05-26T18:30:15.000Z
+```
+
+Common errors:
+- Session already exists with same timestamp and name.
+- ADB unavailable.
+
+## android_session_step
+
+Records an action within a session with optional screenshot and UI dump evidence.
+
+Inputs:
+- `sessionId: string` — from `android_start_session`
+- `action: string` — description of the action taken
+- `screenshot?: boolean` — capture screenshot (default: false)
+- `uiDump?: boolean` — capture UI hierarchy dump (default: false)
+- `deviceId?: string`
+
+Expected output:
+```
+step: 3
+action: tapped login
+timestamp: 2026-05-26T18:31:22.456Z
+screenshot: screenshots/step_tapped-login.png
+```
+
+Common errors:
+- Session not found.
+- Invalid sessionId (path traversal rejected).
+
+## android_stop_session
+
+Finalizes a session: captures logcat, current app, device info, and generates final-report.md.
+
+Inputs:
+- `sessionId: string`
+- `logcatLines?: number` — lines to capture (100–5000, default: 2000)
+- `deviceId?: string`
+
+Expected output:
+```
+sessionId: 2026-05-26_18-30-15_smoke-test
+status: completed
+duration: 2m 34s
+steps: 5
+report: sessions/2026-05-26_18-30-15_smoke-test/final-report.md
+logcat: sessions/2026-05-26_18-30-15_smoke-test/logcat.txt
+```
+
+Common errors:
+- Session not found.
+- Session already completed.
+
+## android_list_sessions
+
+Lists existing sessions with metadata. Ordered by timestamp descending.
+
+Inputs:
+- `limit?: number` — max sessions to return (default: 20, max: 100)
+
+Expected output:
+```
+2026-05-26_18-30-15_smoke-test
+  name: smoke-test
+  status: completed
+  steps: 5
+  duration: 2m 34s
+  device: SM-S908B, Android 14
+
+2026-05-26_17-15_bt-audit
+  name: bt-audit
+  status: active
+  steps: 3
+  duration: —
+  device: SM-S908B, Android 14
+```
+
+## android_get_session_report
+
+Reads the final-report.md for a completed session.
+
+Inputs:
+- `sessionId: string`
+
+Expected output:
+```
+reportPath: sessions/2026-05-26_18-30-15_smoke-test/final-report.md
+---
+# Session: smoke-test
+- Started: 2026-05-26 18:30:15
+...
+```
+
+Common errors:
+- Session not found.
+- Session is still active (run `android_stop_session` first).
