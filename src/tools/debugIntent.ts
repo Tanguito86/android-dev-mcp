@@ -49,7 +49,7 @@ export const registerDebugIntentTool: RegisterTool = (server) => {
           return textResponse(`Unknown debug intent "${intent}" for app "${app}". Available intents: ${available}.`);
         }
 
-        const args: Array<string | number> = ["shell", "am", "broadcast", "-a", action];
+        const args: Array<string | number> = ["shell", "am", "broadcast", "-p", profile.package, "-a", action];
         for (const [key, value] of Object.entries(extras ?? {})) {
           appendExtra(args, key, value);
         }
@@ -63,4 +63,3 @@ export const registerDebugIntentTool: RegisterTool = (server) => {
     }
   );
 };
-

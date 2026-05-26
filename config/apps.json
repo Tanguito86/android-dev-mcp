@@ -135,13 +135,17 @@
       "package": "com.tanguitostudio.soundbend",
       "activity": ".MainActivity",
       "logTags": [
+        "SoundBend-SrcAudit",
+        "SoundBend-SrcMode",
         "SoundBend-DSP",
         "SoundBend-SRC",
-        "SoundBend-AudioTrack"
+        "SoundBend-AudioTrack",
+        "SoundBend-BT"
       ],
       "debugIntents": {
         "openEq": "com.tanguitostudio.soundbend.DEBUG_OPEN_EQ",
-        "dumpAudio": "com.tanguitostudio.soundbend.DEBUG_DUMP_AUDIO"
+        "dumpAudio": "com.tanguitostudio.soundbend.DEBUG_DUMP_AUDIO",
+        "setSrcMode": "com.tanguitostudio.soundbend.DEBUG_SET_SRC_MODE"
       },
       "workflows": {
         "smoke": [
@@ -202,6 +206,40 @@
             "tool": "android_generate_report",
             "args": {
               "lines": 500
+            }
+          }
+        ],
+        "setSrcSystem": [
+          {
+            "tool": "android_send_debug_intent",
+            "args": {
+              "intent": "setSrcMode",
+              "extras": {
+                "mode": "SYSTEM"
+              }
+            }
+          },
+          {
+            "tool": "android_read_logcat",
+            "args": {
+              "lines": 200
+            }
+          }
+        ],
+        "setSrcInternal": [
+          {
+            "tool": "android_send_debug_intent",
+            "args": {
+              "intent": "setSrcMode",
+              "extras": {
+                "mode": "INTERNAL"
+              }
+            }
+          },
+          {
+            "tool": "android_read_logcat",
+            "args": {
+              "lines": 200
             }
           }
         ]
