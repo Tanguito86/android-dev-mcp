@@ -226,6 +226,16 @@ Device control:
 - `android_manage_permissions`
 - `android_set_bluetooth`
 
+App lifecycle:
+
+- `android_list_packages`
+- `android_current_app`
+- `android_app_info`
+- `android_open_app_settings`
+- `android_uninstall_app`
+- `android_start_activity`
+- `android_send_intent`
+
 ## Workflows
 
 Workflows are linear JSON sequences. They do not support loops, conditions, dynamic code, or eval.

@@ -639,3 +639,168 @@ Common errors:
 - `svc bluetooth` blocked on the device.
 - Settings write permission denied.
 - Bluetooth toggles on but immediately off (OEM override).
+
+## android_list_packages
+
+Lists installed packages on the device via `pm list packages`. Optionally filter by case-insensitive substring.
+
+Inputs:
+- `filter?: string` — case-insensitive substring match
+- `deviceId?: string`
+
+Expected output:
+```
+total packages: 312
+matching "google": 14
+---
+com.google.android.gms
+com.google.android.youtube
+...
+```
+
+Common errors:
+- ADB unavailable or device disconnected.
+
+## android_current_app
+
+Returns the currently focused package and activity. Uses `dumpsys window` with `dumpsys activity` fallback.
+
+Inputs:
+- `deviceId?: string`
+
+Expected output:
+```
+package: com.tanguito.soundbend
+activity: com.tanguito.soundbend.ui.MainActivity
+---
+raw currentFocus: Window{abc123 ...}
+```
+
+Common errors:
+- No activity in focus (lock screen, launcher without focus).
+- ADB unavailable.
+
+## android_app_info
+
+Detailed package info from `dumpsys package`. Extracts versionName, versionCode, install/update times, and requested permissions.
+
+Inputs:
+- `app?: string` — config profile name
+- `package?: string` — raw package name
+- `deviceId?: string`
+
+At least one of `app` or `package` must be provided.
+
+Expected output:
+```
+package: com.tanguito.soundbend
+profile: soundbend
+versionName: 1.2.3
+versionCode: 42
+firstInstallTime: 2026-01-15 10:30:00
+lastUpdateTime: 2026-05-20 14:22:00
+status: enabled
+---
+requested permissions (3):
+  android.permission.BLUETOOTH
+  android.permission.POST_NOTIFICATIONS
+  android.permission.RECORD_AUDIO
+```
+
+Common errors:
+- Package not installed on the device.
+- Unknown app profile.
+
+## android_open_app_settings
+
+Opens the system Settings > App Info screen for a package via `APPLICATION_DETAILS_SETTINGS` intent.
+
+Inputs:
+- `app?: string` — config profile name
+- `package?: string` — raw package name
+- `deviceId?: string`
+
+Expected output:
+```
+package: com.tanguito.soundbend
+intent: android.settings.APPLICATION_DETAILS_SETTINGS
+---
+OK — settings screen opened
+```
+
+Common errors:
+- Package not installed.
+- Settings app blocked or disabled on the device.
+
+## android_uninstall_app
+
+Uninstalls an app from the device. **WARNING**: permanent removal. Use `keepData=true` to preserve app data and cache.
+
+Inputs:
+- `app?: string`
+- `package?: string`
+- `keepData?: boolean` — preserve app data directories (default: false)
+- `deviceId?: string`
+
+Expected output:
+```
+package: com.tanguito.soundbend
+keepData: true
+---
+WARNING: App has been uninstalled from the device.
+App data and cache directories were preserved (-k flag).
+---
+OK
+```
+
+Common errors:
+- Package not installed.
+- App is a system app or protected by device policy (`DELETE_FAILED_DEVICE_POLICY_MANAGER`).
+- App is not user-installable (`DELETE_FAILED_INTERNAL_ERROR`).
+
+## android_start_activity
+
+Launches an arbitrary Android component via `am start -n`. No config profile required.
+
+Inputs:
+- `package: string`
+- `activity: string`
+- `action?: string` — optional intent action (e.g. `android.intent.action.VIEW`)
+- `deviceId?: string`
+
+Expected output:
+```
+component: com.android.settings/.Settings
+---
+OK
+```
+
+Common errors:
+- Component does not exist or is not exported.
+- Permission denial (activity is private).
+- Package not installed.
+
+## android_send_intent
+
+Sends a generic Android broadcast intent via `am broadcast` with optional extras. Supports `--es` (string), `--ei` (integer), `--ez` (boolean), `--ef` (float).
+
+Inputs:
+- `action: string` — intent action
+- `package?: string` — limit broadcast to a specific package
+- `component?: string` — target component (`pkg/class`)
+- `extras?: Record<string, string|number|boolean>`
+- `deviceId?: string`
+
+Expected output:
+```
+action: com.example.MY_ACTION
+package: com.test.app
+extras (2): enabled, count
+---
+Broadcast completed
+```
+
+Common errors:
+- No broadcast receivers registered for this intent action.
+- Permission denial (intent requires a permission not granted).
+- Invalid extras types (only string, number, boolean supported).

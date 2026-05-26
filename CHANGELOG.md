@@ -13,6 +13,13 @@ This project follows a simple Keep a Changelog style.
 - `android_clear_app_data` — clears all local data for an app via `pm clear` (with clear warning about data loss).
 - `android_manage_permissions` — grants or revokes a runtime permission for an app via `pm grant/revoke`.
 - `android_set_bluetooth` — enables or disables Bluetooth via `svc bluetooth` + `settings put global` (best-effort, OEM-dependent).
+- `android_list_packages` — lists installed packages via `pm list packages` with optional case-insensitive filter.
+- `android_current_app` — returns the currently focused package/activity via `dumpsys window` + `dumpsys activity`.
+- `android_app_info` — detailed package info (version, install time, permissions) via `dumpsys package`.
+- `android_open_app_settings` — opens the system App Info screen via `APPLICATION_DETAILS_SETTINGS` intent.
+- `android_uninstall_app` — uninstalls an app via `pm uninstall` with optional `-k` to keep data.
+- `android_start_activity` — launches an arbitrary Android component via `am start` (no profile needed).
+- `android_send_intent` — sends a generic broadcast intent with `--es`, `--ei`, `--ez` extras.
 
 ## [1.0.1] - 2026-05-22
 

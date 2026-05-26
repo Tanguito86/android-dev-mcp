@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { registerAppInfoTool } from "./tools/appInfo.js";
 import { registerCaptureStateTool } from "./tools/captureState.js";
 import { registerClearAppDataTool } from "./tools/clearAppData.js";
+import { registerCurrentAppTool } from "./tools/currentApp.js";
 import { registerDebugIntentTool } from "./tools/debugIntent.js";
 import { registerDeviceInfoTool } from "./tools/deviceInfo.js";
 import { registerDevicesTool } from "./tools/devices.js";
@@ -12,22 +14,27 @@ import { registerInputTextTool } from "./tools/inputText.js";
 import { registerInstallApkTool } from "./tools/installApk.js";
 import { registerLaunchAppTool } from "./tools/launchApp.js";
 import { registerListAppsTool } from "./tools/listApps.js";
+import { registerListPackagesTool } from "./tools/listPackages.js";
 import { registerListWorkflowsTool } from "./tools/listWorkflows.js";
 import { registerLogcatTools } from "./tools/logcat.js";
 import { registerManagePermissionsTool } from "./tools/managePermissions.js";
+import { registerOpenAppSettingsTool } from "./tools/openAppSettings.js";
 import { registerRecordVideoTool } from "./tools/recordVideo.js";
 import { registerReportTool } from "./tools/report.js";
 import { registerRunShellTool } from "./tools/runShell.js";
 import { registerRunWorkflowTool } from "./tools/runWorkflow.js";
 import { registerScreenshotTool } from "./tools/screenshot.js";
+import { registerSendIntentTool } from "./tools/sendIntent.js";
 import { registerSetBluetoothTool } from "./tools/setBluetooth.js";
 import { registerSetVolumeTool } from "./tools/setVolume.js";
+import { registerStartActivityTool } from "./tools/startActivity.js";
 import { registerSwipeTool } from "./tools/swipe.js";
 import { registerTapResourceTool } from "./tools/tapResource.js";
 import { registerTapTool } from "./tools/tap.js";
 import { registerTapTextTool } from "./tools/tapText.js";
 import { registerTapUiTool } from "./tools/tapUi.js";
 import { registerUiDumpTool } from "./tools/uiDump.js";
+import { registerUninstallAppTool } from "./tools/uninstallApp.js";
 import { registerWaitForUiTool } from "./tools/waitForUi.js";
 
 const server = new McpServer({
@@ -37,9 +44,13 @@ const server = new McpServer({
 
 registerDevicesTool(server);
 registerListAppsTool(server);
+registerListPackagesTool(server);
 registerListWorkflowsTool(server);
 registerLaunchAppTool(server);
 registerForceStopAppTool(server);
+registerCurrentAppTool(server);
+registerStartActivityTool(server);
+registerAppInfoTool(server);
 registerLogcatTools(server);
 registerScreenshotTool(server);
 registerTapTool(server);
@@ -50,6 +61,7 @@ registerRunShellTool(server);
 registerUiDumpTool(server);
 registerCaptureStateTool(server);
 registerClearAppDataTool(server);
+registerUninstallAppTool(server);
 registerDeviceInfoTool(server);
 registerRecordVideoTool(server);
 registerReportTool(server);
@@ -57,12 +69,14 @@ registerFindUiTool(server);
 registerTapUiTool(server);
 registerWaitForUiTool(server);
 registerDebugIntentTool(server);
+registerSendIntentTool(server);
 registerTapTextTool(server);
 registerTapResourceTool(server);
 registerRunWorkflowTool(server);
 registerSetBluetoothTool(server);
 registerSetVolumeTool(server);
 registerManagePermissionsTool(server);
+registerOpenAppSettingsTool(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
