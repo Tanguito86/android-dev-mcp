@@ -115,4 +115,40 @@ Contents include:
 - Use debug intents for stable app-specific actions.
 - Generate reports at the end of smoke workflows.
 - Keep workflows short and explicit.
+- Enable session capture (`session: true`) for CI-like automated evidence.
+- Set `captureSteps: true` to get screenshots at each step automatically.
+- Use `sessionName` to label the session directory clearly.
+
+## Session capture in workflows
+
+When `android_run_workflow` is called with `session: true`, the workflow runner automatically:
+
+1. Calls `android_start_session` — creates a timestamped session directory
+2. After each step — calls `android_session_step` with action description
+3. On completion or failure — calls `android_stop_session` to generate `final-report.md`
+
+This produces a complete evidence package without manual tool orchestration.
+
+Example:
+
+```json
+{
+  "app": "sampleApp",
+  "workflow": "appSmoke",
+  "session": true,
+  "sessionName": "smoke test v42",
+  "captureSteps": true,
+  "captureUiDumps": true
+}
+```
+
+Output includes `sessionId` and `sessionReport` path in addition to the normal workflow report.
+
+Session evidence is stored under `sessions/<sessionId>/` with:
+- `metadata.json` — start/end times, device info
+- `actions.jsonl` — per-step action log
+- `logcat.txt` — captured at session end
+- `final-report.md` — markdown summary
+- `screenshots/` — per-step PNGs (if captureSteps=true)
+- `ui-dumps/` — per-step XMLs (if captureUiDumps=true)
 

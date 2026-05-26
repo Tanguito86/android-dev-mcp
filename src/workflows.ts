@@ -4,14 +4,28 @@ import { getCurrentActivity } from "./activity.js";
 import { adb, formatOutput, type AdbOptions } from "./adb.js";
 import { getAppProfile, getAppWorkflow, type WorkflowStep } from "./appProfiles.js";
 import { captureScreenshot, captureUiDump, getDeviceMetadata, timestampForPath, writeMetadata } from "./inspection.js";
+import { createSession, appendAction, stopSession, sanitizeName } from "./sessionManager.js";
 import { dumpAndFindUiNodes } from "./tools/findUi.js";
 import { validateWorkflowStepShape } from "./validation.js";
+
+export type SessionOptions = {
+  enabled: boolean;
+  name?: string;
+  captureSteps?: boolean;
+  captureUiDumps?: boolean;
+  clearLogcat?: boolean;
+};
 
 type WorkflowContext = {
   app: string;
   workflow: string;
   deviceId?: string;
   reportDir: string;
+  session?: {
+    sessionId: string;
+    captureSteps: boolean;
+    captureUiDumps: boolean;
+  };
 };
 
 type StepExecution = {
@@ -28,6 +42,8 @@ export type WorkflowExecution = {
   app: string;
   workflow: string;
   reportDir: string;
+  sessionId?: string;
+  sessionReport?: string;
   ok: boolean;
   start: string;
   end: string;
@@ -262,14 +278,46 @@ export function validateWorkflowSteps(steps: WorkflowStep[]): void {
   });
 }
 
-export async function runWorkflow(app: string, workflow: string, deviceId?: string): Promise<WorkflowExecution> {
+export async function runWorkflow(
+  app: string,
+  workflow: string,
+  deviceId?: string,
+  session?: SessionOptions
+): Promise<WorkflowExecution> {
   const startTime = Date.now();
   const start = new Date().toISOString();
   const steps = await getAppWorkflow(app, workflow);
   validateWorkflowSteps(steps);
 
   const reportDir = path.join("workflow-reports", `${timestampForPath()}-${app}-${workflow}`);
-  const context: WorkflowContext = { app, workflow, deviceId, reportDir };
+  const sessionEnabled = session?.enabled === true;
+  const captureSteps = session?.captureSteps !== false; // default true when session enabled
+  const captureUiDumps = session?.captureUiDumps === true; // default false
+  const clearLogcat = session?.clearLogcat !== false; // default true when session enabled
+
+  let sessionId: string | undefined;
+  let sessionReport: string | undefined;
+
+  // Start session if enabled
+  if (sessionEnabled) {
+    const sessionName = session?.name ?? `${app}-${workflow}`;
+    const meta = await createSession(
+      sessionName,
+      clearLogcat,
+      { deviceId },
+      app
+    );
+    sessionId = meta.sessionId;
+  }
+
+  const context: WorkflowContext = {
+    app,
+    workflow,
+    deviceId,
+    reportDir,
+    session: sessionEnabled && sessionId ? { sessionId, captureSteps, captureUiDumps } : undefined
+  };
+
   const stepResults: StepExecution[] = [];
 
   await mkdir(path.resolve(process.cwd(), reportDir), { recursive: true });
@@ -291,18 +339,69 @@ export async function runWorkflow(app: string, workflow: string, deviceId?: stri
         output: result.output,
         paths: result.paths ?? []
       });
+
+      // Record session step
+      if (sessionEnabled && sessionId) {
+        let screenshotRel: string | undefined;
+        let uiDumpRel: string | undefined;
+
+        if (captureSteps) {
+          const stepLabel = `step-${index + 1}`;
+          screenshotRel = `screenshots/${stepLabel}.png`;
+          await captureScreenshot(
+            path.join("sessions", sessionId, screenshotRel),
+            { deviceId }
+          );
+        }
+
+        if (captureUiDumps) {
+          const stepLabel = `step-${index + 1}`;
+          uiDumpRel = `ui-dumps/${stepLabel}.xml`;
+          await captureUiDump(
+            path.join("sessions", sessionId, uiDumpRel),
+            { deviceId }
+          );
+        }
+
+        await appendAction(
+          sessionId,
+          `[${step.tool}] ${typeof step.args?.action === "string" ? step.args.action : "executed"}`,
+          screenshotRel,
+          uiDumpRel
+        );
+      }
     } catch (error) {
       ok = false;
+      const errorMessage = error instanceof Error ? error.message : String(error);
       stepResults.push({
         index,
         tool: step.tool,
         args,
         ok: false,
         durationMs: Date.now() - stepStart,
-        output: error instanceof Error ? error.message : String(error),
+        output: errorMessage,
         paths: []
       });
+
+      // Record failure in session
+      if (sessionEnabled && sessionId) {
+        try {
+          await appendAction(sessionId, `[FAIL] ${step.tool}: ${errorMessage}`);
+        } catch {
+          // Session recording failure should not mask the original error
+        }
+      }
       break;
+    }
+  }
+
+  // Stop session if enabled
+  if (sessionEnabled && sessionId) {
+    try {
+      const meta = await stopSession(sessionId, 2000, { deviceId });
+      sessionReport = `sessions/${sessionId}/final-report.md`;
+    } catch {
+      // Session stop failure is non-fatal for the workflow
     }
   }
 
@@ -311,6 +410,8 @@ export async function runWorkflow(app: string, workflow: string, deviceId?: stri
     app,
     workflow,
     reportDir,
+    sessionId,
+    sessionReport,
     ok,
     start,
     end,

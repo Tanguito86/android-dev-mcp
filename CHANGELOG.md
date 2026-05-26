@@ -26,6 +26,9 @@ This project follows a simple Keep a Changelog style.
 - `android_list_sessions` — lists existing sessions with name, status, step count, and duration.
 - `android_get_session_report` — reads the final-report.md for a completed session.
 
+### Changed
+- `android_run_workflow` — now accepts optional `session`, `sessionName`, `captureSteps`, `captureUiDumps`, `clearLogcat` parameters for automatic evidence capture.
+
 ## [1.0.1] - 2026-05-22
 
 ### Changed

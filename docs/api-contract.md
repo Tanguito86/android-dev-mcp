@@ -506,19 +506,52 @@ Common errors:
 
 ## android_run_workflow
 
-Runs a linear workflow declared in `config/apps.json`.
+Runs a linear workflow declared in `config/apps.json`. Optionally captures a full evidence session.
 
 Inputs:
 - `app: string`
 - `workflow: string`
 - `deviceId?: string`
+- `session?: boolean` — enable automatic session capture (default: false)
+- `sessionName?: string` — custom session name (default: `<app>-<workflow>`)
+- `captureSteps?: boolean` — screenshot per step (default: true when session enabled)
+- `captureUiDumps?: boolean` — UI dump per step (default: false)
+- `clearLogcat?: boolean` — clear logcat at session start (default: true when session enabled)
 
-Expected output:
-- Workflow report path, per-step status, duration, generated paths, and final result.
+When `session: true`, the workflow automatically:
+1. Creates a session with device info and optional logcat clear
+2. Records each step with action description and optional evidence
+3. On completion/failure, stops the session and generates `final-report.md`
+
+Expected output (without session):
+```
+Workflow sampleApp/appSmoke: OK
+duration: 2340 ms
+report: workflow-reports/2026-05-26_18-30-15-sampleApp-appSmoke
+[0] android_launch_app: OK (450 ms)
+...
+```
+
+Expected output (with session):
+```
+Workflow sampleApp/appSmoke: OK
+duration: 2890 ms
+report: workflow-reports/2026-05-26_18-30-15-sampleApp-appSmoke
+sessionId: 2026-05-26_18-30-15_sampleapp-appsmoke
+sessionReport: sessions/2026-05-26_18-30-15_sampleapp-appsmoke/final-report.md
+...
+```
 
 Example:
 ```json
-{ "app": "sampleApp", "workflow": "appSmoke", "deviceId": "SERIAL" }
+{
+  "app": "sampleApp",
+  "workflow": "appSmoke",
+  "session": true,
+  "sessionName": "sample smoke test",
+  "captureSteps": true,
+  "captureUiDumps": true
+}
 ```
 
 Common errors:
@@ -526,6 +559,7 @@ Common errors:
 - Unknown workflow.
 - Unsupported step tool.
 - ADB failure in one step.
+- Session already exists with same timestamp and name.
 
 ## android_device_info
 

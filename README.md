@@ -243,6 +243,7 @@ Session capture:
 - `android_stop_session`
 - `android_list_sessions`
 - `android_get_session_report`
+- `android_run_workflow` now supports `session: true` for automatic evidence capture
 
 ## Workflows
 
