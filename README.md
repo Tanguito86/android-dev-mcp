@@ -218,6 +218,14 @@ Project automation:
 - `android_send_debug_intent`
 - `android_run_workflow`
 
+Device control:
+
+- `android_device_info`
+- `android_set_volume`
+- `android_clear_app_data`
+- `android_manage_permissions`
+- `android_set_bluetooth`
+
 ## Workflows
 
 Workflows are linear JSON sequences. They do not support loops, conditions, dynamic code, or eval.

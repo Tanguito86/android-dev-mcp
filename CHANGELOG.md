@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 This project follows a simple Keep a Changelog style.
 
+## [Unreleased]
+
+### Added
+
+- `android_device_info` — returns manufacturer, model, Android version, SDK, ABI, battery level, and charging status via `getprop` + `dumpsys battery`.
+- `android_set_volume` — sets media volume (or any stream) on the device via `media volume`.
+- `android_clear_app_data` — clears all local data for an app via `pm clear` (with clear warning about data loss).
+- `android_manage_permissions` — grants or revokes a runtime permission for an app via `pm grant/revoke`.
+- `android_set_bluetooth` — enables or disables Bluetooth via `svc bluetooth` + `settings put global` (best-effort, OEM-dependent).
+
 ## [1.0.1] - 2026-05-22
 
 ### Changed

@@ -526,3 +526,116 @@ Common errors:
 - Unknown workflow.
 - Unsupported step tool.
 - ADB failure in one step.
+
+## android_device_info
+
+Returns device manufacturer, model, Android version, SDK, ABI, battery level, and charging status.
+
+Inputs:
+- `deviceId?: string`
+
+Expected output (one line per field):
+```
+manufacturer: samsung
+model: SM-S908B
+device: b0s
+androidVersion: 14
+sdk: 34
+abi: arm64-v8a
+batteryLevel: 85%
+chargingStatus: discharging
+```
+
+Common errors:
+- ADB unavailable.
+- No device connected.
+
+## android_set_volume
+
+Sets volume level for an audio stream (default: media / stream 3).
+
+Inputs:
+- `level: number` (0–15)
+- `stream?: number` (default 3)
+- `deviceId?: string`
+
+Expected output:
+```
+stream: 3
+level: 7
+---
+OK
+```
+
+Common errors:
+- Level out of range (0–15).
+- `media volume` command not available (older Android).
+
+## android_clear_app_data
+
+Clears all local data, cache, login, and preferences for an app. **WARNING: destructive — resets app to factory state.**
+
+Inputs:
+- `app: string` (resolved from config/apps.json)
+- `deviceId?: string`
+
+Expected output:
+```
+app: soundbend
+package: com.tanguitostudio.soundbend
+---
+WARNING: All local data has been cleared (preferences, cache, login, config).
+result: Success
+```
+
+Common errors:
+- Unknown app profile.
+- App not installed on device.
+- `pm clear` blocked by device policy.
+
+## android_manage_permissions
+
+Grants or revokes a runtime permission for an app.
+
+Inputs:
+- `app: string` (resolved from config/apps.json)
+- `permission: string`
+- `action: "grant" | "revoke"`
+- `deviceId?: string`
+
+Expected output:
+```
+app: soundbend
+package: com.tanguitostudio.soundbend
+permission: android.permission.POST_NOTIFICATIONS
+action: grant
+---
+```
+
+Common errors:
+- Permission is not a runtime permission (cannot be managed via ADB).
+- App not installed.
+- Action blocked by Android security policy.
+
+## android_set_bluetooth
+
+Enables or disables Bluetooth. **Best-effort**: may fail depending on Android version, OEM, and security policies.
+
+Inputs:
+- `enabled: boolean`
+- `deviceId?: string`
+
+Expected output:
+```
+requested: enabled
+---
+svc bluetooth enable: OK
+settings put global bluetooth_on 1: OK
+---
+NOTE: Bluetooth enable may fail on some devices due to OEM restrictions or Android security policies.
+```
+
+Common errors:
+- `svc bluetooth` blocked on the device.
+- Settings write permission denied.
+- Bluetooth toggles on but immediately off (OEM override).
