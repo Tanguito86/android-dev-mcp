@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { timestampForPath } from "../dist/inspection.js";
 
 // Unit tests for session manager helpers.
 // These test pure logic: sanitization, validation, metadata generation,
@@ -271,16 +272,7 @@ test("listSessions sorts by timestamp descending and marks status", () => {
 // ── timestampForPath format ──
 
 test("timestampForPath produces safe filename with no colons", () => {
-  const pad = (n) => String(n).padStart(2, "0");
-  const timestampForPath = (date) => {
-    return [
-      date.getFullYear(),
-      "-", pad(date.getMonth() + 1), "-", pad(date.getDate()),
-      "_", pad(date.getHours()), "-", pad(date.getMinutes()), "-", pad(date.getSeconds())
-    ].join("");
-  };
-
-  const ts = timestampForPath(new Date("2026-05-26T18:30:15Z"));
+  const ts = timestampForPath(new Date(2026, 4, 26, 18, 30, 15));
   assert.equal(ts, "2026-05-26_18-30-15");
   assert.ok(!ts.includes(":"), "timestamp must not contain colons for Windows compatibility");
   assert.ok(!ts.includes("T"), "timestamp must not contain T");
